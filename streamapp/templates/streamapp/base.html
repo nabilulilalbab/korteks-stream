@@ -19,8 +19,8 @@
     
     <!-- Tailwind CSS -->
     <!-- Gunakan CDN untuk development, uncomment output.css untuk production dengan Tailwind CLI -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    {% comment %} <link rel="stylesheet" href="{% static 'css/output.css' %}"> {% endcomment %}
+    {% comment %} <script src="https://cdn.tailwindcss.com"></script> {% endcomment %}
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
     
     <!-- Konfigurasi Tailwind untuk tema baru -->
     <script>
@@ -259,6 +259,25 @@
         }
     </style>
     
+    <!-- CSS tambahan untuk memastikan ikon toggle tema berfungsi dengan benar -->
+    <style>
+        /* Memastikan ikon matahari hanya muncul di light mode */
+        html:not(.dark) .fa-sun {
+            display: inline-block !important;
+        }
+        html:not(.dark) .fa-moon {
+            display: none !important;
+        }
+        
+        /* Memastikan ikon bulan hanya muncul di dark mode */
+        html.dark .fa-sun {
+            display: none !important;
+        }
+        html.dark .fa-moon {
+            display: inline-block !important;
+        }
+    </style>
+    
     {% block extra_css %}{% endblock %}
 </head>
 <body class="theme-transition min-h-screen flex flex-col dark:text-white text-black">
@@ -272,8 +291,8 @@
                         <span class="text-xl sm:text-2xl font-bold text-black dark:text-white">🎌 Kortek<span class="text-red-500">Stream</span></span>
                     </a>
                     
-                    <!-- Desktop Navigation Links -->
-                    <div class="hidden md:ml-6 md:flex md:space-x-4">
+                    <!-- Desktop Navigation Links - Hanya tampil pada ukuran large (lg) dan lebih besar -->
+                    <div class="hidden lg:ml-6 lg:flex lg:space-x-4">
                         <a href="{% url 'streamapp:index' %}" class="px-3 py-2 rounded-md text-sm font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">Beranda</a>
                         <a href="{% url 'streamapp:all_list_anime_terbaru' %}" class="px-3 py-2 rounded-md text-sm font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">Anime Terbaru</a>
                         <a href="{% url 'streamapp:all_list_jadwal_rilis' %}" class="px-3 py-2 rounded-md text-sm font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">Jadwal Rilis</a>
@@ -281,9 +300,9 @@
                     </div>
                 </div>
                 
-                <div class="flex items-center space-x-2 sm:space-x-4">
-                    <!-- Search Bar - Hidden on smallest screens, shown with icon -->
-                    <div class="hidden sm:block relative flex-1 max-w-md">
+                <div class="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
+                    <!-- Search Bar - Tampil pada ukuran medium (md) dan lebih besar -->
+                    <div class="hidden md:block relative flex-1 max-w-md">
                         <form action="{% url 'streamapp:search' %}" method="GET" class="flex items-center">
                             <input type="text" name="q" placeholder="Cari anime..."
                                 class="w-full px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-white/80 dark:bg-white/10 backdrop-blur-md border border-primary/30 dark:border-white/20 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-red-500 text-sm" required>
@@ -293,41 +312,43 @@
                         </form>
                     </div>
                     
-                    <!-- Search Icon for Mobile -->
-                    <button id="mobile-search-button" class="sm:hidden text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 rounded-full flex items-center justify-center transition-colors">
+                    <!-- Search Icon untuk Mobile dan Tablet -->
+                    <button id="mobile-search-button" class="md:hidden text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 rounded-full flex items-center justify-center transition-colors">
                         <i class="fas fa-search w-4 h-4"></i>
                     </button>
                     
-                    <!-- Collection Links - Hidden on smallest screens, shown in mobile menu -->
-                    <div class="hidden sm:flex space-x-1 sm:space-x-2">
-                        <a href="{% url 'streamapp:user_collection' %}?tab=watchlist" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-colors">
-                            <i class="fas fa-bookmark w-4 h-4 sm:w-5 sm:h-5"></i>
+                    <!-- Collection Links - Tampil pada ukuran medium (md) dan lebih besar -->
+                    <div class="hidden md:flex space-x-1 md:space-x-2">
+                        <a href="{% url 'streamapp:user_collection' %}?tab=watchlist" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-colors">
+                            <i class="fas fa-bookmark w-4 h-4 md:w-5 md:h-5"></i>
                         </a>
                         
-                        <a href="{% url 'streamapp:user_collection' %}?tab=favorites" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-colors">
-                            <i class="fas fa-heart w-4 h-4 sm:w-5 sm:h-5"></i>
+                        <a href="{% url 'streamapp:user_collection' %}?tab=favorites" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-colors">
+                            <i class="fas fa-heart w-4 h-4 md:w-5 md:h-5"></i>
                         </a>
                         
-                        <a href="{% url 'streamapp:user_collection' %}?tab=history" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-colors">
-                            <i class="fas fa-clock w-4 h-4 sm:w-5 sm:h-5"></i>
+                        <a href="{% url 'streamapp:user_collection' %}?tab=history" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-colors">
+                            <i class="fas fa-clock w-4 h-4 md:w-5 md:h-5"></i>
                         </a>
                     </div>
                     
-                    <!-- Theme Toggle -->
-                    <button id="theme-toggle" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-colors">
-                        <i class="fas fa-sun dark:hidden w-4 h-4 sm:w-5 sm:h-5"></i>
-                        <i class="fas fa-moon hidden dark:inline w-4 h-4 sm:w-5 sm:h-5"></i>
+                    <!-- Theme Toggle - Selalu tampil -->
+                    <button id="theme-toggle" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-colors">
+                        <!-- Ikon matahari (tampil di light mode, sembunyi di dark mode) -->
+                        <i class="fas fa-sun w-4 h-4 md:w-5 md:h-5 inline-block dark:hidden"></i>
+                        <!-- Ikon bulan (sembunyi di light mode, tampil di dark mode) -->
+                        <i class="fas fa-moon w-4 h-4 md:w-5 md:h-5 hidden dark:inline-block"></i>
                     </button>
                     
-                    <!-- Mobile menu button -->
-                    <button id="mobile-menu-button" class="md:hidden text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-colors">
-                        <i class="fas fa-bars w-4 h-4 sm:w-5 sm:h-5"></i>
+                    <!-- Mobile menu button - Tampil pada ukuran di bawah large (lg) -->
+                    <button id="mobile-menu-button" class="lg:hidden text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-colors">
+                        <i class="fas fa-bars w-4 h-4 md:w-5 md:h-5"></i>
                     </button>
                 </div>
             </div>
             
             <!-- Mobile Search Bar (initially hidden) -->
-            <div id="mobile-search" class="sm:hidden hidden mt-3 mb-2">
+            <div id="mobile-search" class="md:hidden hidden mt-3 mb-2">
                 <form action="{% url 'streamapp:search' %}" method="GET" class="flex items-center">
                     <div class="relative w-full">
                         <input type="text" name="q" placeholder="Cari anime..."
@@ -340,7 +361,7 @@
             </div>
             
             <!-- Mobile Navigation Menu -->
-            <div id="mobile-menu" class="md:hidden hidden mt-3 pb-2 border-t border-gray-200 dark:border-gray-700/30 pt-2">
+            <div id="mobile-menu" class="lg:hidden hidden mt-3 pb-2 border-t border-gray-200 dark:border-gray-700/30 pt-2">
                 <div class="flex flex-col space-y-2">
                     <a href="{% url 'streamapp:index' %}" class="px-3 py-2 rounded-md text-base font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">
                         <i class="fas fa-home mr-2"></i>Beranda
@@ -355,7 +376,8 @@
                         <i class="fas fa-film mr-2"></i>Movie
                     </a>
                     
-                    <div class="grid grid-cols-3 gap-2 mt-2">
+                    <!-- Collection Links untuk Mobile dan Tablet (md) -->
+                    <div class="md:hidden grid grid-cols-3 gap-2 mt-2">
                         <a href="{% url 'streamapp:user_collection' %}?tab=watchlist" class="flex flex-col items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-black dark:text-white bg-primary/10 dark:bg-white/10 hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">
                             <i class="fas fa-bookmark mb-1"></i>
                             <span>Watchlist</span>
@@ -413,7 +435,7 @@
     
     <!-- JavaScript -->
     <script>
-        // Toggle mobile menu
+        // Toggle mobile menu - Untuk ukuran layar di bawah large (lg)
         document.getElementById('mobile-menu-button').addEventListener('click', function() {
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenu.classList.toggle('hidden');
@@ -423,9 +445,12 @@
             if (mobileSearch && !mobileSearch.classList.contains('hidden')) {
                 mobileSearch.classList.add('hidden');
             }
+            
+            // Log untuk debugging
+            console.log('Mobile menu toggled:', !mobileMenu.classList.contains('hidden'));
         });
         
-        // Toggle mobile search
+        // Toggle mobile search - Untuk ukuran layar di bawah medium (md)
         const mobileSearchButton = document.getElementById('mobile-search-button');
         if (mobileSearchButton) {
             mobileSearchButton.addEventListener('click', function() {
@@ -443,19 +468,52 @@
                     if (!mobileMenu.classList.contains('hidden')) {
                         mobileMenu.classList.add('hidden');
                     }
+                    
+                    // Log untuk debugging
+                    console.log('Mobile search shown and focused');
+                } else {
+                    console.log('Mobile search hidden');
                 }
             });
         }
         
+        // Menangani perubahan ukuran layar untuk responsivitas
+        window.addEventListener('resize', function() {
+            const width = window.innerWidth;
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileSearch = document.getElementById('mobile-search');
+            
+            // Jika ukuran layar >= 1024px (lg), sembunyikan mobile menu
+            if (width >= 1024 && mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+                console.log('Mobile menu hidden due to large screen size');
+            }
+            
+            // Jika ukuran layar >= 768px (md), sembunyikan mobile search
+            if (width >= 768 && mobileSearch && !mobileSearch.classList.contains('hidden')) {
+                mobileSearch.classList.add('hidden');
+                console.log('Mobile search hidden due to medium screen size');
+            }
+        });
+        
         // Toggle theme (light/dark)
         document.getElementById('theme-toggle').addEventListener('click', function() {
+            console.log('Toggle theme clicked');
+            console.log('Before toggle - Dark mode:', document.documentElement.classList.contains('dark'));
+            
             document.documentElement.classList.toggle('dark');
+            
+            console.log('After toggle - Dark mode:', document.documentElement.classList.contains('dark'));
+            console.log('Sun icon display:', getComputedStyle(document.querySelector('.fa-sun')).display);
+            console.log('Moon icon display:', getComputedStyle(document.querySelector('.fa-moon')).display);
             
             // Save theme preference to localStorage
             if (document.documentElement.classList.contains('dark')) {
                 localStorage.setItem('theme', 'dark');
+                console.log('Theme set to dark in localStorage');
             } else {
                 localStorage.setItem('theme', 'light');
+                console.log('Theme set to light in localStorage');
             }
         });
         
@@ -574,24 +632,33 @@
     
     <!-- Panduan untuk Tailwind CLI -->
     <!--
-    Jika menggunakan Tailwind CLI, pastikan untuk:
-    1. Tambahkan kelas kustom ke safelist di input.css:
-       @source "../../**/templates/*.html";
-       @source "../../**/templates/**/*.html";
-       
-    2. Jika light mode rusak, gunakan kelas alternatif berikut:
-       - Ganti 'light-bg' dengan 'tw-light-bg'
-       - Ganti 'light-text' dengan 'tw-light-text'
-       - Ganti 'light-border' dengan 'tw-light-border'
-       
-       Contoh:
-       <div class="light-bg light-text light-border">...</div>
-       menjadi:
-       <div class="tw-light-bg tw-light-text tw-light-border">...</div>
-       
-    3. Jalankan build dengan: npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css
+    Jika menggunakan Tailwind CLI dan light mode rusak, ganti kelas kustom dengan kelas Tailwind standar:
     
-    4. Jika masih bermasalah, kembali ke Tailwind CDN dengan menghapus komentar pada:
+    1. Ganti 'light-bg' dengan kombinasi kelas Tailwind berikut:
+       - Light mode: 'bg-white/95 border-yellow-600 shadow-md'
+       - Dark mode: 'dark:bg-black/30 dark:border-gray-500/50 dark:shadow-none'
+       
+    2. Ganti 'light-text' dengan:
+       - Light mode: 'text-black font-medium'
+       - Dark mode: 'dark:text-white dark:font-normal'
+       
+    3. Ganti 'light-border' dengan:
+       - Light mode: 'border-yellow-600 border'
+       - Dark mode: 'dark:border-gray-500/50 dark:border'
+       
+    Contoh:
+    Dari:
+    <div class="light-bg light-text light-border">...</div>
+    
+    Menjadi:
+    <div class="bg-white/95 border-yellow-600 shadow-md dark:bg-black/30 dark:border-gray-500/50 dark:shadow-none text-black font-medium dark:text-white dark:font-normal border-yellow-600 border dark:border-gray-500/50 dark:border">...</div>
+    
+    Atau lebih sederhana:
+    <div class="bg-white/95 border-yellow-600 shadow-md text-black font-medium border dark:bg-black/30 dark:border-gray-500/50 dark:shadow-none dark:text-white dark:font-normal">...</div>
+    
+    4. Jalankan build dengan: npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css
+    
+    5. Jika masih bermasalah, kembali ke Tailwind CDN dengan menghapus komentar pada:
        <script src="https://cdn.tailwindcss.com"></script>
        dan menambahkan komentar pada:
        <link rel="stylesheet" href="{% static 'css/output.css' %}">
