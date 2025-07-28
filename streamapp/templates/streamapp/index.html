@@ -1,0 +1,570 @@
+{% extends 'streamapp/base.html' %}
+
+{% block title %}KortekStream - Nonton Anime Subtitle Indonesia{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Top Anime Banner -->
+<section class="relative">
+    {% if anime_mingguan and anime_mingguan.0 %}
+        <!-- Hero Carousel -->
+        <div id="hero-carousel" class="relative h-[50vh] overflow-hidden">
+            {% for anime in anime_mingguan|slice:":5" %}
+                <div class="hero-slide absolute inset-0 transition-all duration-1000 {% if forloop.first %}opacity-100{% else %}opacity-0{% endif %}" data-index="{{ forloop.counter0 }}">
+                    <!-- Background Image with Blur -->
+                    <div class="absolute inset-0">
+                        <img src="{{ anime.cover }}" alt="{{ anime.judul }}" class="w-full h-full object-cover blur-sm scale-110">
+                    </div>
+                    
+                    <!-- Overlay Layers -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/95 via-black/80 to-black/70 dark:from-black/95 dark:via-black/80 dark:to-black/70"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/40 dark:from-black/90 dark:via-black/60 dark:to-black/40"></div>
+                    <div class="absolute inset-0 bg-black/40 dark:bg-black/40"></div>
+                    
+                    <!-- Hero Content -->
+                    <div class="relative z-10 container mx-auto px-4 h-full flex items-center">
+                        <div class="max-w-2xl">
+                            <!-- Badges -->
+                            <div class="flex items-center space-x-2 mb-4">
+                                <span class="px-2 py-1 text-xs font-semibold bg-red-600 text-white rounded-md">Top Anime</span>
+                                {% if anime.genres and anime.genres.0 %}
+                                    <span class="px-2 py-1 text-xs font-semibold bg-red-600/30 text-white border border-red-500/50 rounded-md">{{ anime.genres.0 }}</span>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Title -->
+                            <h1 class="text-3xl md:text-4xl font-bold text-white mb-3 line-clamp-2">{{ anime.judul }}</h1>
+                            
+                            <!-- Rating & Episode -->
+                            <div class="flex items-center space-x-6 mb-6 text-gray-300">
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-yellow-400 mr-2"></i>
+                                    <span>{{ anime.rating }}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Buttons -->
+                            <div class="flex space-x-4">
+                                <a href="{% url 'streamapp:detail_anime' anime.anime_slug %}" class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors">
+                                    <i class="fas fa-play mr-2"></i>Tonton Sekarang
+                                </a>
+                                <button onclick="addToWatchlist({{ anime.id|default:'null' }}, '{{ anime.judul|escapejs }}', '{{ anime.anime_slug|escapejs }}', '{{ anime.cover|escapejs }}')" class="px-6 py-3 bg-transparent border border-white/30 text-white font-medium rounded-lg hover:bg-white/20 transition-colors">
+                                    <i class="fas fa-bookmark mr-2"></i>Tambah ke Watchlist
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <!-- Hero Navigation -->
+            <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex justify-center space-x-2 z-20">
+                {% for anime in anime_mingguan|slice:":5" %}
+                    <button class="hero-dot w-3 h-3 rounded-full bg-white/50 hover:bg-white/80 transition-colors {% if forloop.first %}bg-white{% endif %}" data-index="{{ forloop.counter0 }}"></button>
+                {% endfor %}
+            </div>
+            
+            <!-- Hero Arrows -->
+            <button class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 dark:bg-black/50 dark:hover:bg-black/70 text-white p-3 rounded-full z-20" id="hero-prev">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 dark:bg-black/50 dark:hover:bg-black/70 text-white p-3 rounded-full z-20" id="hero-next">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        
+        <!-- Top 10 Anime Carousel -->
+        <div class="relative -mt-16 z-10 container mx-auto px-4">
+            <div class="bg-black/80 backdrop-blur-md rounded-lg border border-white/20 p-6 dark:bg-black/80">
+                <div class="flex items-center mb-4">
+                    <i class="fas fa-trophy text-yellow-400 w-6 h-6 mr-2"></i>
+                    <h2 class="text-2xl font-bold text-white">Top 10 Anime Mingguan</h2>
+                </div>
+                
+                <div class="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide">
+                    {% for anime in anime_mingguan %}
+                        <div class="group anime-card flex-shrink-0 w-[180px] bg-black/80 backdrop-blur-md rounded-lg overflow-hidden border border-white/20 hover:bg-black/60 transition-all duration-300 dark:bg-black/80 dark:hover:bg-black/60">
+                            <a href="{% if anime.anime_slug %}{% url 'streamapp:detail_anime' anime.anime_slug %}{% else %}{% url 'streamapp:detail_anime' anime.url|cut:'https://samehadaku.now/anime/'|cut:'/' %}{% endif %}" class="block">
+                                <div class="relative">
+                                    <img src="{{ anime.cover }}" alt="{{ anime.judul }}" class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                                    
+                                    <!-- Rating Badge -->
+                                    <div class="absolute top-1 right-1 bg-gray-900/80 text-xs px-1.5 py-0.5 rounded flex items-center dark:bg-gray-900/80">
+                                        <i class="fas fa-star text-yellow-400 w-2 h-2 mr-1"></i>
+                                        {{ anime.rating }}
+                                    </div>
+                                    
+                                    <!-- Ranking Badge -->
+                                    <div class="absolute top-1 left-1 bg-red-600 text-white font-bold text-xs w-5 h-5 flex items-center justify-center rounded-full dark:bg-red-600">
+                                        {{ forloop.counter }}
+                                    </div>
+                                </div>
+                                
+                                <div class="p-2 flex-1 flex flex-col justify-center">
+                                    <h3 class="title text-xs font-medium text-white line-clamp-2 min-h-[2.5rem] flex items-center text-center">{{ anime.judul }}</h3>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</section>
+
+<!-- Main Content -->
+<div class="container mx-auto px-4 py-8">
+    <!-- Anime Terbaru Section -->
+    <section class="mb-12">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center">
+                <i class="fas fa-clock text-red-400 w-6 h-6 mr-2"></i>
+                <h2 class="text-2xl font-bold text-white">Episode Terbaru</h2>
+            </div>
+            <a href="{% url 'streamapp:all_list_anime_terbaru' %}" class="text-red-400 hover:text-red-300 font-medium flex items-center">
+                Lihat Semua
+                <i class="fas fa-chevron-right ml-2 text-sm"></i>
+            </a>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {% for anime in anime_terbaru %}
+                <div class="group anime-card bg-white/10 backdrop-blur-md rounded-lg overflow-hidden border border-white/20 hover:bg-white/20 transition-all duration-300">
+                    <a href="{% url 'streamapp:detail_anime' anime.url|cut:'https://samehadaku.now/anime/'|cut:'/' %}" class="block">
+                        <div class="relative">
+                            <img src="{{ anime.cover }}" alt="{{ anime.judul }}" class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                            
+                            <!-- Episode Badge -->
+                            <div class="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-md dark:bg-red-600">
+                                {{ anime.episode }}
+                            </div>
+                            
+                            <!-- Play Button -->
+                            <div class="absolute top-2 right-2 bg-black/50 hover:bg-black/70 dark:bg-black/50 dark:hover:bg-black/70 w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-play text-white text-xs"></i>
+                            </div>
+                            
+                            <!-- Content on Image -->
+                            <div class="absolute bottom-2 left-2 right-2">
+                                <h3 class="title text-white font-medium text-xs line-clamp-2">{{ anime.judul }}</h3>
+                            </div>
+                        </div>
+                        
+                        <div class="p-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-400 truncate">{{ anime.posted_by }}</span>
+                                <span class="text-gray-500">{{ anime.rilis }}</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    
+    <!-- Movie Section -->
+    <section class="mb-12">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center">
+                <i class="fas fa-film text-red-400 w-6 h-6 mr-2"></i>
+                <h2 class="text-2xl font-bold text-white">Movie</h2>
+            </div>
+            <a href="{% url 'streamapp:all_list_movie' %}" class="text-red-400 hover:text-red-300 font-medium flex items-center">
+                Lihat Semua
+                <i class="fas fa-chevron-right ml-2 text-sm"></i>
+            </a>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {% for item in movie %}
+                <div class="group anime-card bg-white/10 backdrop-blur-md rounded-lg overflow-hidden border border-white/20 hover:bg-white/20 transition-all duration-300">
+                    <a href="{% url 'streamapp:detail_anime' item.url|cut:'https://samehadaku.now/anime/'|cut:'/' %}" class="block">
+                        <div class="relative">
+                            <img src="{{ item.cover }}" alt="{{ item.judul }}" class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                            
+                            <!-- Movie Badge -->
+                            <div class="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-md dark:bg-red-600">
+                                Movie
+                            </div>
+                            
+                            <!-- Play Button -->
+                            <div class="absolute top-2 right-2 bg-black/50 hover:bg-black/70 dark:bg-black/50 dark:hover:bg-black/70 w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-play text-white text-xs"></i>
+                            </div>
+                            
+                            <!-- Content on Image -->
+                            <div class="absolute bottom-2 left-2 right-2">
+                                <h3 class="title text-white font-medium text-xs line-clamp-2">{{ item.judul }}</h3>
+                            </div>
+                        </div>
+                        
+                        <div class="p-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-400 truncate">{{ item.genres.0|default:"Movie" }}</span>
+                                <span class="text-gray-500">{{ item.tanggal }}</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    
+    <!-- Jadwal Rilis Section -->
+    <section>
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center">
+                <i class="fas fa-calendar text-red-400 w-6 h-6 mr-2"></i>
+                <h2 class="text-2xl font-bold text-white">Jadwal Rilis</h2>
+            </div>
+            <a href="{% url 'streamapp:all_list_jadwal_rilis' %}" class="text-red-400 hover:text-red-300 font-medium flex items-center">
+                Lihat Semua →
+            </a>
+        </div>
+        
+        <!-- Content Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for day, anime_list in jadwal_rilis.items %}
+                {% if forloop.counter <= 4 %}
+                    <div class="bg-white/10 backdrop-blur-md rounded-lg border border-white/20 dark:bg-white/10">
+                        <div class="p-4">
+                            <h3 class="text-white font-bold mb-3 text-lg">{{ day }}</h3>
+                            
+                            {% if anime_list %}
+                                <div class="space-y-3">
+                                    {% for anime in anime_list|slice:":5" %}
+                                        {% if anime.anime_slug %}
+                                        <a href="{% url 'streamapp:detail_anime' anime.anime_slug %}" class="block hover:bg-white/10 rounded-lg transition-colors p-2">
+                                        {% else %}
+                                        <div class="block p-2">
+                                        {% endif %}
+                                            <div class="flex items-center space-x-3">
+                                                <img src="{{ anime.cover_url }}" alt="{{ anime.title }}" class="w-12 h-8 object-cover rounded">
+                                                <div class="flex-1 min-w-0">
+                                                    <h4 class="text-white text-sm font-medium truncate">{{ anime.title }}</h4>
+                                                    <p class="text-gray-400 text-xs">{{ anime.release_time }}</p>
+                                                </div>
+                                            </div>
+                                        {% if anime.anime_slug %}
+                                        </a>
+                                        {% else %}
+                                        </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-gray-400 text-sm">Tidak ada anime untuk hari ini.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<!-- Custom CSS for scrollbar hiding and hero carousel -->
+<style>
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    
+    .hero-slide {
+        transition: opacity 0.5s ease-in-out;
+    }
+</style>
+
+<!-- JavaScript for Hero Carousel and Local Storage Features -->
+<script>
+    // Hero Carousel Auto-Slide
+    document.addEventListener('DOMContentLoaded', function() {
+        const slides = document.querySelectorAll('.hero-slide');
+        const dots = document.querySelectorAll('.hero-dot');
+        const prevBtn = document.getElementById('hero-prev');
+        const nextBtn = document.getElementById('hero-next');
+        let currentSlide = 0;
+        let slideInterval;
+        
+        // Function to show a specific slide
+        function showSlide(index) {
+            // Hide all slides
+            slides.forEach(slide => {
+                slide.classList.remove('opacity-100');
+                slide.classList.add('opacity-0');
+            });
+            
+            // Update dots
+            dots.forEach(dot => {
+                dot.classList.remove('bg-white/80');
+                dot.classList.add('bg-white/50');
+            });
+            
+            // Show the selected slide
+            slides[index].classList.remove('opacity-0');
+            slides[index].classList.add('opacity-100');
+            
+            // Update the selected dot
+            dots[index].classList.remove('bg-white/50');
+            dots[index].classList.add('bg-white/80');
+            
+            // Update current slide index
+            currentSlide = index;
+        }
+        
+        // Function to show the next slide
+        function nextSlide() {
+            let next = currentSlide + 1;
+            if (next >= slides.length) {
+                next = 0;
+            }
+            showSlide(next);
+        }
+        
+        // Function to show the previous slide
+        function prevSlide() {
+            let prev = currentSlide - 1;
+            if (prev < 0) {
+                prev = slides.length - 1;
+            }
+            showSlide(prev);
+        }
+        
+        // Start auto-slide
+        function startSlideInterval() {
+            slideInterval = setInterval(nextSlide, 5000);
+        }
+        
+        // Stop auto-slide
+        function stopSlideInterval() {
+            clearInterval(slideInterval);
+        }
+        
+        // Add event listeners to dots
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                stopSlideInterval();
+                showSlide(index);
+                startSlideInterval();
+            });
+        });
+        
+        // Add event listeners to prev/next buttons
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                stopSlideInterval();
+                prevSlide();
+                startSlideInterval();
+            });
+        }
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                stopSlideInterval();
+                nextSlide();
+                startSlideInterval();
+            });
+        }
+        
+        // Start the auto-slide
+        startSlideInterval();
+        
+        // Pause auto-slide when hovering over the carousel
+        const carousel = document.getElementById('hero-carousel');
+        if (carousel) {
+            carousel.addEventListener('mouseenter', stopSlideInterval);
+            carousel.addEventListener('mouseleave', startSlideInterval);
+        }
+    });
+    
+    // Local Storage Functions for Watchlist, Favorites, and Watch History
+    
+    // Watchlist Functions
+    function getWatchlist() {
+        try {
+            const watchlist = localStorage.getItem('kortekstream_watchlist');
+            return watchlist ? JSON.parse(watchlist) : [];
+        } catch (error) {
+            console.error('Error getting watchlist:', error);
+            return [];
+        }
+    }
+    
+    function addToWatchlist(animeId, title, slug, cover) {
+        try {
+            const watchlist = getWatchlist();
+            
+            // Check if anime is already in watchlist
+            if (!watchlist.some(item => item.slug === slug)) {
+                watchlist.push({
+                    id: animeId || Date.now(),
+                    title: title,
+                    slug: slug,
+                    cover: cover,
+                    addedAt: new Date().toISOString()
+                });
+                
+                localStorage.setItem('kortekstream_watchlist', JSON.stringify(watchlist));
+                alert('Anime ditambahkan ke watchlist!');
+            } else {
+                alert('Anime sudah ada di watchlist!');
+            }
+        } catch (error) {
+            console.error('Error adding to watchlist:', error);
+            alert('Gagal menambahkan ke watchlist');
+        }
+    }
+    
+    function removeFromWatchlist(slug) {
+        try {
+            let watchlist = getWatchlist();
+            watchlist = watchlist.filter(item => item.slug !== slug);
+            localStorage.setItem('kortekstream_watchlist', JSON.stringify(watchlist));
+            return true;
+        } catch (error) {
+            console.error('Error removing from watchlist:', error);
+            return false;
+        }
+    }
+    
+    function isInWatchlist(slug) {
+        const watchlist = getWatchlist();
+        return watchlist.some(item => item.slug === slug);
+    }
+    
+    // Favorites Functions
+    function getFavorites() {
+        try {
+            const favorites = localStorage.getItem('kortekstream_favorites');
+            return favorites ? JSON.parse(favorites) : [];
+        } catch (error) {
+            console.error('Error getting favorites:', error);
+            return [];
+        }
+    }
+    
+    function addToFavorites(animeId, title, slug, cover) {
+        try {
+            const favorites = getFavorites();
+            
+            // Check if anime is already in favorites
+            if (!favorites.some(item => item.slug === slug)) {
+                favorites.push({
+                    id: animeId || Date.now(),
+                    title: title,
+                    slug: slug,
+                    cover: cover,
+                    addedAt: new Date().toISOString()
+                });
+                
+                localStorage.setItem('kortekstream_favorites', JSON.stringify(favorites));
+                alert('Anime ditambahkan ke favorit!');
+            } else {
+                alert('Anime sudah ada di favorit!');
+            }
+        } catch (error) {
+            console.error('Error adding to favorites:', error);
+            alert('Gagal menambahkan ke favorit');
+        }
+    }
+    
+    function removeFromFavorites(slug) {
+        try {
+            let favorites = getFavorites();
+            favorites = favorites.filter(item => item.slug !== slug);
+            localStorage.setItem('kortekstream_favorites', JSON.stringify(favorites));
+            return true;
+        } catch (error) {
+            console.error('Error removing from favorites:', error);
+            return false;
+        }
+    }
+    
+    function isInFavorites(slug) {
+        const favorites = getFavorites();
+        return favorites.some(item => item.slug === slug);
+    }
+    
+    // Watch History Functions
+    function getWatchHistory() {
+        try {
+            const history = localStorage.getItem('kortekstream_history');
+            return history ? JSON.parse(history) : [];
+        } catch (error) {
+            console.error('Error getting watch history:', error);
+            return [];
+        }
+    }
+    
+    function addToWatchHistory(animeId, title, slug, episodeSlug, episodeTitle, cover) {
+        try {
+            let history = getWatchHistory();
+            
+            // Limit history to 100 items
+            if (history.length >= 100) {
+                history = history.slice(0, 99);
+            }
+            
+            // Add to beginning of array (most recent first)
+            history.unshift({
+                id: animeId || Date.now(),
+                title: title,
+                slug: slug,
+                episodeSlug: episodeSlug,
+                episodeTitle: episodeTitle,
+                cover: cover,
+                watchedAt: new Date().toISOString()
+            });
+            
+            localStorage.setItem('kortekstream_history', JSON.stringify(history));
+        } catch (error) {
+            console.error('Error adding to watch history:', error);
+        }
+    }
+    
+    function clearWatchHistory() {
+        try {
+            localStorage.removeItem('kortekstream_history');
+            return true;
+        } catch (error) {
+            console.error('Error clearing watch history:', error);
+            return false;
+        }
+    }
+    
+    // Track episode clicks to add to watch history
+    document.addEventListener('DOMContentLoaded', function() {
+        const episodeLinks = document.querySelectorAll('a[href*="detail_episode_video"]');
+        
+        episodeLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Get anime info from closest parent
+                const card = this.closest('.anime-card');
+                if (card) {
+                    const titleEl = card.querySelector('.title');
+                    const coverEl = card.querySelector('img');
+                    
+                    if (titleEl && coverEl) {
+                        const title = titleEl.textContent.trim();
+                        const cover = coverEl.src;
+                        const href = this.getAttribute('href');
+                        const episodeSlug = href.split('/').pop();
+                        const episodeTitle = this.textContent.trim();
+                        
+                        // Extract anime slug from the URL
+                        const animeSlug = card.querySelector('a[href*="detail_anime"]')?.href.split('/').pop() || '';
+                        
+                        addToWatchHistory(null, title, animeSlug, episodeSlug, episodeTitle, cover);
+                    }
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

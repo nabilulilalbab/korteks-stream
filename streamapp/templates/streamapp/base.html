@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="id" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}KortekStream{% endblock %}</title>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:image" content="https://cdn.builder.io/api/v1/image/assets%2Fc5b47d20f6a943e485717e5895739988%2F56c6badd41c34fbbadac34159211505e">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="KortekStream - Nonton Anime Subtitle Indonesia">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://cdn.builder.io/api/v1/image/assets%2Fc5b47d20f6a943e485717e5895739988%2F56c6badd41c34fbbadac34159211505e">
+    <meta name="twitter:image:alt" content="KortekStream - Nonton Anime Subtitle Indonesia">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Konfigurasi Tailwind untuk tema baru -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        // Warna utama untuk light mode
+                        primary: {
+                            light: '#ffd700', // gold
+                            DEFAULT: '#daa520', // goldenrod
+                            dark: '#b8860b', // darkgoldenrod
+                        },
+                        secondary: {
+                            light: '#ffffff',
+                            DEFAULT: '#f8f9fa',
+                            dark: '#e9ecef',
+                        },
+                        
+                        // Dark mode colors
+                        darkPrimary: {
+                            light: '#f87171', // red-400
+                            DEFAULT: '#dc2626', // red-600
+                            dark: '#b91c1c', // red-700
+                        },
+                        darkSecondary: {
+                            light: '#1a1a1a', // Hitam dengan gradasi
+                            DEFAULT: '#121212',
+                            dark: '#000000',
+                        },
+                    },
+                    backdropBlur: {
+                        xs: '2px',
+                        sm: '4px',
+                        md: '16px',
+                        lg: '24px',
+                        xl: '40px',
+                    },
+                    animation: {
+                        'gradient-x': 'gradient-x 3s ease infinite',
+                        'gradient-y': 'gradient-y 3s ease infinite',
+                        'gradient-xy': 'gradient-xy 3s ease infinite',
+                    },
+                    keyframes: {
+                        'gradient-x': {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            }
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        /* Animasi loading */
+        .loader {
+            border-top-color: #e74c3c;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
+        }
+        
+        @-webkit-keyframes spinner {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+        
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Efek hover untuk card anime */
+        .anime-card {
+            transition: all 0.3s ease;
+        }
+        
+        .anime-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        /* Scrollbar custom */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Dark mode scrollbar */
+        .dark ::-webkit-scrollbar-track {
+            background: #121212;
+        }
+        
+        .dark ::-webkit-scrollbar-thumb {
+            background: #e74c3c;
+        }
+        
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #ff4d4d;
+        }
+        
+        /* Efek blur untuk hero section */
+        .hero-overlay {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.7) 100%);
+        }
+        
+        /* Dark mode hero overlay */
+        .dark .hero-overlay {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(69,10,10,0.5) 50%, rgba(0,0,0,0.7) 100%);
+        }
+        
+        /* Hero Background dengan Blur Effect untuk dark mode */
+        .dark .hero-bg {
+            filter: blur(4px);
+            transform: scale(1.1);
+        }
+        
+        /* Image Overlay Gradients untuk dark mode */
+        .dark .img-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 60%);
+        }
+        
+        /* Animasi untuk tema */
+        .theme-transition {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        /* Background dan styling untuk light dan dark mode */
+        body {
+            background: #ffffff;
+            color: #000000;
+            background-attachment: fixed;
+        }
+        
+        /* Dark mode styling - Background Halaman Utama */
+        .dark body {
+            background: linear-gradient(to bottom right, #000000, #450a0a, #000000);
+            background-attachment: fixed;
+            background-size: 200% 200%;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        
+        /* Glass effect for dark mode - Enhanced Glass Morphism */
+        .dark .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.125);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        /* Custom Red Variants for dark mode */
+        .dark .bg-red-950-custom {
+            background-color: #450a0a;
+        }
+        
+        .dark .bg-red-900-custom {
+            background-color: #7f1d1d;
+        }
+        
+        /* Card styling for dark mode - Card Background Utama */
+        .dark .bg-white\/10 {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .dark .hover\:bg-white\/20:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        /* Scrollbar styling for dark mode */
+        .dark .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .dark .scrollbar-thin::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: rgba(239, 68, 68, 0.5);
+            border-radius: 3px;
+        }
+        
+        /* Hero Background dengan Blur Effect untuk dark mode */
+        .dark .hero-bg {
+            filter: blur(4px);
+            transform: scale(1.1);
+        }
+        
+        .dark .hero-overlay {
+            background: linear-gradient(to bottom,
+                rgba(0,0,0,0.7) 0%,
+                rgba(69,10,10,0.5) 50%,
+                rgba(0,0,0,0.7) 100%);
+        }
+        
+        /* Image Overlay Gradients untuk dark mode */
+        .dark .img-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 60%);
+        }
+        
+        /* Header/Navbar Background untuk dark mode */
+                .dark .bg-black\/20 {
+                    background-color: rgba(0,0,0,0.2);
+                    backdrop-filter: blur(16px);
+                    border-bottom: 1px solid rgba(255,255,255,0.1);
+                }
+                
+                /* Header/Navbar Background untuk light mode */
+                :not(.dark) .bg-black\/20 {
+                    background-color: rgba(255,255,255,0.9);
+                    backdrop-filter: blur(16px);
+                    border-bottom: 1px solid rgba(218,165,32,0.3);
+                }
+        
+        /* Hero Background Animation */
+        @keyframes hero-slide {
+            0% { transform: scale(1.1) translateX(0); }
+            100% { transform: scale(1.1) translateX(-10px); }
+        }
+        
+        .dark .hero-bg-animate {
+            animation: hero-slide 20s ease-in-out infinite alternate;
+        }
+        
+        /* Fallback backgrounds */
+        .dark .bg-fallback {
+            background: linear-gradient(135deg, #000000 0%, #450a0a 50%, #000000 100%);
+        }
+        
+        /* CSS CUSTOM UNTUK EFEK KHUSUS DARK MODE */
+        
+        /* Enhanced Glass Effect untuk dark mode */
+        .dark .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.125);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        /* Mobile Adaptations untuk dark mode */
+        @media (max-width: 640px) {
+            .dark body {
+                background: linear-gradient(to bottom, #000000, #450a0a, #000000);
+            }
+            
+            .dark .glass-card,
+            .dark .bg-white\/10 {
+                backdrop-filter: blur(8px);
+            }
+        }
+        
+        /* Fallback untuk browser lama */
+        @supports not (backdrop-filter: blur(16px)) {
+            .dark .backdrop-blur-md {
+                background: rgba(0, 0, 0, 0.8) !important;
+            }
+        }
+        
+        /* Scroll Bar Styling untuk dark mode */
+        .dark .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .dark .scrollbar-thin::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: rgba(239, 68, 68, 0.5);
+            border-radius: 3px;
+        }
+        
+        /* Border styling untuk light mode */
+                :not(.dark) .border-white\/10 {
+                    border-color: rgba(218, 165, 32, 0.3) !important; /* goldenrod dengan opacity */
+                }
+                
+                :not(.dark) .border-white\/20 {
+                    border-color: rgba(218, 165, 32, 0.5) !important; /* goldenrod dengan opacity */
+                }
+                
+                :not(.dark) .border-gray-700\/50,
+                :not(.dark) .border-gray-700\/30 {
+                    border-color: rgba(218, 165, 32, 0.3) !important; /* goldenrod dengan opacity */
+                }
+                
+                /* Border styling untuk dark mode */
+                .dark .border-white\/10 {
+                    border-color: rgba(255, 255, 255, 0.1) !important;
+                }
+                
+                .dark .border-white\/20 {
+                    border-color: rgba(255, 255, 255, 0.2) !important;
+                }
+                
+                .dark .border-gray-700\/50,
+                .dark .border-gray-700\/30 {
+                    border-color: rgba(255, 255, 255, 0.1) !important;
+                }
+        
+        /* Background styling untuk card di light mode */
+                :not(.dark) .bg-white\/10 {
+                    background-color: rgba(255, 255, 255, 0.9) !important;
+                    border: 1px solid rgba(218, 165, 32, 0.5) !important;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                }
+                
+                :not(.dark) .bg-black\/80,
+                :not(.dark) .bg-black\/30,
+                :not(.dark) .bg-black\/20,
+                :not(.dark) .bg-black\/40,
+                :not(.dark) .bg-black\/50,
+                :not(.dark) .bg-black\/60,
+                :not(.dark) .bg-black\/70 {
+                    background-color: rgba(255, 255, 255, 0.9) !important;
+                    border: 1px solid rgba(218, 165, 32, 0.5) !important;
+                }
+        
+        /* Text color untuk light mode */
+                :not(.dark) .text-white {
+                    color: #000000 !important;
+                }
+                
+                :not(.dark) .text-gray-400,
+                :not(.dark) .text-gray-300,
+                :not(.dark) .text-gray-500,
+                :not(.dark) .text-gray-600,
+                :not(.dark) .text-gray-700 {
+                    color: #555555 !important;
+                }
+                
+                :not(.dark) .text-red-400,
+                :not(.dark) .text-red-300,
+                :not(.dark) .text-red-500,
+                :not(.dark) .text-red-600,
+                :not(.dark) .text-red-700 {
+                    color: #daa520 !important; /* goldenrod */
+                }
+        
+        /* Hover effects untuk light mode */
+                :not(.dark) .hover\:bg-white\/20:hover {
+                    background-color: rgba(218, 165, 32, 0.2) !important;
+                }
+                
+                :not(.dark) .hover\:bg-black\/60:hover,
+                :not(.dark) .hover\:bg-black\/70:hover,
+                :not(.dark) .hover\:bg-black\/50:hover,
+                :not(.dark) .hover\:bg-black\/40:hover {
+                    background-color: rgba(218, 165, 32, 0.2) !important;
+                }
+                
+                :not(.dark) .hover\:text-red-300:hover,
+                :not(.dark) .hover\:text-red-400:hover,
+                :not(.dark) .hover\:text-red-500:hover,
+                :not(.dark) .hover\:text-primary:hover,
+                :not(.dark) .hover\:text-white:hover {
+                    color: #b8860b !important; /* darkgoldenrod */
+                }
+        
+        /* Hover effects untuk dark mode */
+                .dark .hover\:bg-white\/20:hover {
+                    background-color: rgba(255, 255, 255, 0.2) !important;
+                }
+                
+                .dark .hover\:bg-black\/60:hover,
+                .dark .hover\:bg-black\/70:hover,
+                .dark .hover\:bg-black\/50:hover,
+                .dark .hover\:bg-black\/40:hover {
+                    background-color: rgba(0, 0, 0, 0.6) !important;
+                }
+                
+                .dark .hover\:text-red-300:hover,
+                .dark .hover\:text-red-400:hover,
+                .dark .hover\:text-red-500:hover,
+                .dark .hover\:text-primary:hover,
+                .dark .hover\:text-white:hover {
+                    color: #fca5a5 !important; /* red-300 */
+                }
+        
+        /* Button styling untuk light mode */
+                :not(.dark) .bg-red-600,
+                :not(.dark) .bg-red-500,
+                :not(.dark) .bg-red-700,
+                :not(.dark) .bg-primary,
+                :not(.dark) .bg-primary\/80 {
+                    background-color: #daa520 !important; /* goldenrod */
+                    color: white !important;
+                }
+                
+                :not(.dark) .hover\:bg-red-700:hover,
+                :not(.dark) .hover\:bg-red-600:hover,
+                :not(.dark) .hover\:bg-red-500:hover,
+                :not(.dark) .hover\:bg-primary:hover,
+                :not(.dark) .hover\:bg-primary\/80:hover {
+                    background-color: #b8860b !important; /* darkgoldenrod */
+                }
+                
+                :not(.dark) .bg-red-600\/20,
+                :not(.dark) .bg-red-600\/30,
+                :not(.dark) .bg-red-600\/40,
+                :not(.dark) .bg-red-500\/20,
+                :not(.dark) .bg-red-500\/30,
+                :not(.dark) .bg-red-500\/40,
+                :not(.dark) .bg-primary\/20,
+                :not(.dark) .bg-primary\/30,
+                :not(.dark) .bg-primary\/40 {
+                    background-color: rgba(218, 165, 32, 0.2) !important;
+                }
+        
+        /* Button styling untuk dark mode */
+                .dark .bg-red-600,
+                .dark .bg-red-500,
+                .dark .bg-red-700,
+                .dark .bg-primary,
+                .dark .bg-primary\/80 {
+                    background-color: #dc2626 !important; /* red-600 */
+                    color: white !important;
+                }
+                
+                .dark .hover\:bg-red-700:hover,
+                .dark .hover\:bg-red-600:hover,
+                .dark .hover\:bg-red-500:hover,
+                .dark .hover\:bg-primary:hover,
+                .dark .hover\:bg-primary\/80:hover {
+                    background-color: #b91c1c !important; /* red-700 */
+                }
+                
+                .dark .bg-red-600\/20,
+                .dark .bg-red-600\/30,
+                .dark .bg-red-600\/40,
+                .dark .bg-red-500\/20,
+                .dark .bg-red-500\/30,
+                .dark .bg-red-500\/40,
+                .dark .bg-primary\/20,
+                .dark .bg-primary\/30,
+                .dark .bg-primary\/40 {
+                    background-color: rgba(220, 38, 38, 0.2) !important;
+                }
+        
+        /* Badge styling untuk light mode */
+                :not(.dark) .bg-yellow-500\/80,
+                :not(.dark) .bg-yellow-500,
+                :not(.dark) .bg-yellow-400,
+                :not(.dark) .bg-gray-900\/80,
+                :not(.dark) .bg-gray-900 {
+                    background-color: rgba(218, 165, 32, 0.8) !important;
+                    color: white !important;
+                }
+        
+        /* Navbar dan footer styling untuk light mode */
+                :not(.dark) .bg-black\/20,
+                :not(.dark) .bg-black\/30,
+                :not(.dark) .bg-black\/40,
+                :not(.dark) .bg-black\/50,
+                :not(.dark) .bg-black\/60,
+                :not(.dark) .bg-black\/70,
+                :not(.dark) .bg-black\/80 {
+                    background-color: rgba(255, 255, 255, 0.9) !important;
+                    border-color: rgba(218, 165, 32, 0.3) !important;
+                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                }
+        
+        /* Footer styling untuk dark mode */
+                .dark .bg-black\/30,
+                .dark .bg-black\/20,
+                .dark .bg-black\/40,
+                .dark .bg-black\/50,
+                .dark .bg-black\/60,
+                .dark .bg-black\/70,
+                .dark .bg-black\/80 {
+                    background-color: rgba(0,0,0,0.3);
+                    backdrop-filter: blur(16px);
+                    border-color: rgba(255,255,255,0.1);
+                }
+        
+        /* Jadwal rilis styling untuk light mode */
+                :not(.dark) .space-y-3 > a:hover,
+                :not(.dark) .space-y-3 > div:hover {
+                    background-color: rgba(218, 165, 32, 0.2) !important;
+                }
+                
+                /* Icon styling untuk light mode */
+                :not(.dark) .text-yellow-400,
+                :not(.dark) .text-yellow-500,
+                :not(.dark) .text-yellow-300 {
+                    color: #daa520 !important; /* goldenrod */
+                }
+        
+        /* Placeholder styling untuk light mode */
+                :not(.dark) ::placeholder {
+                    color: rgba(0, 0, 0, 0.5) !important;
+                }
+                
+                :not(.dark) .placeholder-gray-400::placeholder {
+                    color: rgba(0, 0, 0, 0.5) !important;
+                }
+                
+                /* Placeholder styling untuk dark mode */
+                .dark ::placeholder {
+                    color: rgba(255, 255, 255, 0.5) !important;
+                }
+                
+                .dark .placeholder-gray-400::placeholder {
+                    color: rgba(255, 255, 255, 0.5) !important;
+                }
+                
+                /* Focus styling untuk light mode */
+                :not(.dark) .focus\:ring-red-500:focus,
+                :not(.dark) .focus\:ring-primary:focus {
+                    --tw-ring-color: rgba(218, 165, 32, 0.5) !important;
+                }
+                
+                /* Focus styling untuk dark mode */
+                .dark .focus\:ring-red-500:focus,
+                .dark .focus\:ring-primary:focus {
+                    --tw-ring-color: rgba(220, 38, 38, 0.5) !important;
+                }
+                
+                /* Styling untuk notifikasi */
+                .notification {
+                    position: fixed;
+                    top: 0;
+                    z-index: 100;
+                    display: flex;
+                    max-height: screen;
+                    width: full;
+                    flex-direction: column-reverse;
+                    padding: 1rem;
+                }
+        
+        @media (min-width: 640px) {
+            .notification {
+                bottom: 0;
+                right: 0;
+                top: auto;
+                flex-direction: column;
+                max-width: 420px;
+            }
+        }
+        
+        /* Efek hover dinamis untuk card anime */
+        .dynamic-border:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="theme-transition min-h-screen flex flex-col dark:text-white text-black">
+    <!-- Navbar - Header/Navbar Background -->
+    <nav class="sticky top-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/10">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <!-- Logo -->
+                    <a href="{% url 'streamapp:index' %}" class="flex-shrink-0 flex items-center">
+                        <span class="text-2xl font-bold text-white">🎌 Kortek<span class="text-red-500">Stream</span></span>
+                    </a>
+                    
+                    <!-- Desktop Navigation Links -->
+                    <div class="hidden md:ml-6 md:flex md:space-x-4">
+                        <a href="{% url 'streamapp:index' %}" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/20 transition-colors">Beranda</a>
+                        <a href="{% url 'streamapp:all_list_anime_terbaru' %}" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/20 transition-colors">Anime Terbaru</a>
+                        <a href="{% url 'streamapp:all_list_jadwal_rilis' %}" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/20 transition-colors">Jadwal Rilis</a>
+                        <a href="{% url 'streamapp:all_list_movie' %}" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/20 transition-colors">Movie</a>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- Search Bar -->
+                    <div class="relative flex-1 max-w-md">
+                        <form action="{% url 'streamapp:search' %}" method="GET" class="flex items-center">
+                            <input type="text" name="q" placeholder="Cari anime..."
+                                class="w-full px-4 py-2 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                            <button type="submit" class="absolute right-0 top-0 mt-2 mr-3 text-gray-400 hover:text-white">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Collection Links -->
+                    <a href="{% url 'streamapp:user_collection' %}?tab=watchlist" class="text-white hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
+                        <i class="fas fa-bookmark w-5 h-5"></i>
+                    </a>
+                    
+                    <a href="{% url 'streamapp:user_collection' %}?tab=favorites" class="text-white hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
+                        <i class="fas fa-heart w-5 h-5"></i>
+                    </a>
+                    
+                    <a href="{% url 'streamapp:user_collection' %}?tab=history" class="text-white hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
+                        <i class="fas fa-clock w-5 h-5"></i>
+                    </a>
+                    
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" class="text-white hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
+                        <i class="fas fa-sun dark:hidden w-5 h-5"></i>
+                        <i class="fas fa-moon hidden dark:inline w-5 h-5"></i>
+                    </button>
+                    
+                    <!-- Mobile menu button -->
+                    <button id="mobile-menu-button" class="md:hidden text-white hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
+                        <i class="fas fa-bars w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Navigation Menu -->
+            <div id="mobile-menu" class="md:hidden hidden mt-4">
+                <div class="flex flex-col space-y-2">
+                    <a href="{% url 'streamapp:index' %}" class="px-3 py-2 rounded-md text-base font-medium text-white hover:bg-white/20 transition-colors">Beranda</a>
+                    <a href="{% url 'streamapp:all_list_anime_terbaru' %}" class="px-3 py-2 rounded-md text-base font-medium text-white hover:bg-white/20 transition-colors">Anime Terbaru</a>
+                    <a href="{% url 'streamapp:all_list_jadwal_rilis' %}" class="px-3 py-2 rounded-md text-base font-medium text-white hover:bg-white/20 transition-colors">Jadwal Rilis</a>
+                    <a href="{% url 'streamapp:all_list_movie' %}" class="px-3 py-2 rounded-md text-base font-medium text-white hover:bg-white/20 transition-colors">Movie</a>
+                    <div class="grid grid-cols-3 gap-2 mt-2">
+                        <a href="{% url 'streamapp:user_collection' %}?tab=watchlist" class="flex flex-col items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-white bg-white/10 hover:bg-white/20 transition-colors">
+                            <i class="fas fa-bookmark mb-1"></i>
+                            <span>Watchlist</span>
+                        </a>
+                        <a href="{% url 'streamapp:user_collection' %}?tab=favorites" class="flex flex-col items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-white bg-white/10 hover:bg-white/20 transition-colors">
+                            <i class="fas fa-heart mb-1"></i>
+                            <span>Favorit</span>
+                        </a>
+                        <a href="{% url 'streamapp:user_collection' %}?tab=history" class="flex flex-col items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-white bg-white/10 hover:bg-white/20 transition-colors">
+                            <i class="fas fa-clock mb-1"></i>
+                            <span>Riwayat</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-black/30 backdrop-blur-md py-6 mt-10 border-t border-white/10">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <span class="text-xl font-bold text-white">🎌 Kortek<span class="text-red-500">Stream</span></span>
+                    <p class="text-gray-300 text-sm mt-1">Nonton Anime Subtitle Indonesia</p>
+                </div>
+                
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fab fa-discord"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="mt-4 text-center text-gray-400 text-sm">
+                <p>&copy; 2025 KortekStream. Semua hak dilindungi.</p>
+                <p class="mt-1">Disclaimer: Semua konten anime yang ditampilkan di situs ini bersumber dari pihak ketiga.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- JavaScript -->
+    <script>
+        // Toggle mobile menu
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Toggle theme (light/dark)
+        document.getElementById('theme-toggle').addEventListener('click', function() {
+            document.documentElement.classList.toggle('dark');
+            
+            // Save theme preference to localStorage
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+        
+        // Set dark mode as default
+        if (!localStorage.getItem('theme')) {
+            localStorage.setItem('theme', 'dark');
+        }
+        
+        // Check for saved theme preference
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+        
+        // Handle tab selection in user_collection page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we're on the user_collection page
+            const collectionTabs = document.getElementById('collection-tabs');
+            if (collectionTabs) {
+                // Get the tab from URL parameter or default to watchlist
+                const urlParams = new URLSearchParams(window.location.search);
+                const activeTab = urlParams.get('tab') || 'watchlist';
+                
+                // Find the tab button and simulate a click
+                const tabButton = document.getElementById(`${activeTab}-tab`);
+                if (tabButton) {
+                    tabButton.click();
+                }
+            }
+        });
+        
+        // Dynamic border color based on cover image
+        function setDynamicBorderColor(cardElement, imageElement) {
+            if (!cardElement || !imageElement) return;
+            
+            // Create canvas to analyze image
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            
+            // When image is loaded
+            imageElement.addEventListener('load', function() {
+                canvas.width = this.width;
+                canvas.height = this.height;
+                context.drawImage(this, 0, 0, this.width, this.height);
+                
+                // Get pixel data from the center of the image
+                const imageData = context.getImageData(
+                    Math.floor(this.width / 2), 
+                    Math.floor(this.height / 2), 
+                    1, 1
+                ).data;
+                
+                // Convert RGB to hex
+                const color = `#${imageData[0].toString(16).padStart(2, '0')}${imageData[1].toString(16).padStart(2, '0')}${imageData[2].toString(16).padStart(2, '0')}`;
+                
+                // Apply color to card border on hover
+                cardElement.addEventListener('mouseenter', function() {
+                    this.style.borderColor = color;
+                    this.querySelector('.title').style.color = color;
+                });
+                
+                cardElement.addEventListener('mouseleave', function() {
+                    this.style.borderColor = '';
+                    this.querySelector('.title').style.color = '';
+                });
+            });
+        }
+        
+        // Apply dynamic border to all anime cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const animeCards = document.querySelectorAll('.anime-card');
+            animeCards.forEach(card => {
+                const image = card.querySelector('img');
+                if (image) {
+                    setDynamicBorderColor(card, image);
+                }
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

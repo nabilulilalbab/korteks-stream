@@ -1,0 +1,467 @@
+{% extends 'streamapp/base.html' %}
+
+{% block title %}{% if anime %}{{ anime.title }}{% else %}Detail Anime{% endif %} - KortekStream{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3 bg-black/30 backdrop-blur-md px-4 py-2 rounded-lg border border-gray-700/50 dark:bg-black/30">
+            <li class="inline-flex items-center">
+                <a href="{% url 'streamapp:index' %}" class="inline-flex items-center text-sm font-medium text-white hover:text-primary transition-colors">
+                    <i class="fas fa-home mr-2"></i>
+                    Beranda
+                </a>
+            </li>
+            <li aria-current="page">
+                <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                    <span class="text-sm font-medium text-gray-300">{% if anime %}{{ anime.title }}{% else %}Detail Anime{% endif %}</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+    
+    {% if error %}
+        <div class="bg-black/30 backdrop-blur-md border border-red-500/50 text-red-300 px-4 py-3 rounded-xl mb-8 dark:bg-black/30 dark:border-red-500/50 dark:text-red-300">
+            <h2 class="text-xl font-bold">{{ error }}</h2>
+            <p>Silakan coba lagi nanti atau kembali ke beranda.</p>
+        </div>
+    {% elif anime %}
+        <!-- Anime Header -->
+        <div class="relative mb-8 rounded-xl overflow-hidden">
+            <!-- Background Image with Blur -->
+            <div class="absolute inset-0 z-0">
+                <img src="{{ anime.thumbnail_url }}" alt="{{ anime.title }}" class="w-full h-full object-cover blur-md opacity-30">
+                <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80 dark:from-black/70 dark:via-black/60 dark:to-black/80"></div>
+            </div>
+            
+            <!-- Content -->
+            <div class="relative z-10 flex flex-col md:flex-row backdrop-blur-md bg-black/30 rounded-xl overflow-hidden border border-gray-700/50 dark:bg-black/30">
+                <!-- Thumbnail -->
+                <div class="md:w-1/3 lg:w-1/4 relative">
+                    <img src="{{ anime.thumbnail_url }}" alt="{{ anime.title }}" class="w-full h-auto object-cover">
+                    <div class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black to-transparent"></div>
+                </div>
+                
+                <!-- Info -->
+                <div class="p-6 flex-1">
+                    <div class="flex flex-col md:flex-row md:items-start md:justify-between">
+                        <div>
+                            <h1 class="text-2xl md:text-3xl font-bold text-white mb-3">{{ anime.title }}</h1>
+                            
+                            <div class="inline-block bg-yellow-500/80 backdrop-blur-sm text-white px-3 py-1 rounded-md font-bold mb-4 dark:bg-yellow-500/80">
+                                <span><i class="fas fa-star mr-1"></i> {{ anime.rating.score }}</span>
+                                <small>({{ anime.rating.users }})</small>
+                            </div>
+                        </div>
+                        
+                        <!-- User Action Buttons -->
+                        <div class="flex space-x-2 mb-4 md:mb-0">
+                            <button id="watchlist-btn" onclick="toggleWatchlist('{{ anime.title|escapejs }}', '{{ request.path|cut:'/detail_anime/'|escapejs }}', '{{ anime.thumbnail_url|escapejs }}')" class="flex items-center px-4 py-2 bg-primary/80 backdrop-blur-sm text-white rounded-lg hover:bg-primary transition-colors dark:bg-primary/80 dark:hover:bg-primary">
+                                <i id="watchlist-icon" class="fas fa-bookmark mr-2"></i>
+                                <span id="watchlist-text">Tambah ke Watchlist</span>
+                            </button>
+                            
+                            <button id="favorite-btn" onclick="toggleFavorite('{{ anime.title|escapejs }}', '{{ request.path|cut:'/detail_anime/'|escapejs }}', '{{ anime.thumbnail_url|escapejs }}')" class="flex items-center px-4 py-2 bg-black/50 backdrop-blur-sm text-white rounded-lg hover:bg-black/70 transition-colors dark:bg-black/50 dark:hover:bg-black/70">
+                                <i id="favorite-icon" class="far fa-heart mr-2"></i>
+                                <span id="favorite-text">Favorit</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        {% for genre in anime.genres %}
+                            <span class="bg-primary/40 backdrop-blur-sm text-white px-2 py-1 rounded-md text-sm dark:bg-primary/40">{{ genre }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="text-gray-300 mb-4">
+                        <p>{{ anime.synopsis }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Detail Information -->
+        <div class="bg-black/30 backdrop-blur-md rounded-xl shadow-lg p-6 mb-8 border border-gray-700/50 dark:bg-black/30">
+            <h2 class="text-xl font-bold text-white mb-4 pb-2 border-b border-gray-700/50">Informasi Detail</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for key, value in anime.details.items %}
+                    <div class="py-2 border-b border-gray-700/30 dark:border-gray-700/30">
+                        <span class="font-semibold text-gray-300">{{ key }}:</span>
+                        <span class="text-gray-400 ml-2">{{ value }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Episode List -->
+        <div class="bg-black/30 backdrop-blur-md rounded-xl shadow-lg p-6 mb-8 border border-gray-700/50 dark:bg-black/30">
+            <h2 class="text-xl font-bold text-white mb-4 pb-2 border-b border-gray-700/50">Daftar Episode</h2>
+            
+            {% if anime.episode_list %}
+                <div class="divide-y divide-gray-700/30">
+                    {% for episode in anime.episode_list %}
+                        <div class="py-3 hover:bg-black/50 transition-colors rounded-md group dark:hover:bg-black/50">
+                            {% if episode.url %}
+                                {% with episode_slug=episode.url|cut:"https://samehadaku.now/"|cut:"/" %}
+                                    <a href="{% url 'streamapp:detail_episode_video' episode_slug %}" class="block relative">
+                                        <div class="font-semibold text-white group-hover:text-primary transition-colors">{{ episode.title }}</div>
+                                        <div class="text-sm text-gray-400">Rilis: {{ episode.release_date }}</div>
+                                        <div class="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <i class="fas fa-play text-primary"></i>
+                                        </div>
+                                    </a>
+                                {% endwith %}
+                            {% else %}
+                                <div class="font-semibold text-white">{{ episode.title }}</div>
+                                <div class="text-sm text-gray-400">Rilis: {{ episode.release_date }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-400">Belum ada episode yang tersedia.</p>
+            {% endif %}
+        </div>
+        
+        <!-- Recommendations -->
+        {% if anime.recommendations %}
+            <div class="bg-black/30 backdrop-blur-md rounded-xl shadow-lg p-6 mb-8 border border-gray-700/50 dark:bg-black/30">
+                <h2 class="text-xl font-bold text-white mb-4 pb-2 border-b border-gray-700/50">Rekomendasi Anime Lainnya</h2>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                    {% for rec in anime.recommendations %}
+                        <div class="anime-card dynamic-border group relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 dark:shadow-lg dark:hover:shadow-xl">
+                            <a href="{% url 'streamapp:detail_anime' rec.url|cut:'https://samehadaku.now/anime/'|cut:'/' %}" class="block">
+                                <!-- Card Background with Blur Effect -->
+                                <div class="absolute inset-0 bg-black/20 backdrop-blur-md rounded-xl z-0 dark:bg-black/20"></div>
+                                
+                                <!-- Image Container -->
+                                <div class="relative pb-[140%] overflow-hidden z-10">
+                                    <!-- Image with Gradient Overlay -->
+                                    <div class="absolute inset-0 w-full h-full">
+                                        <img src="{{ rec.cover_url }}" alt="{{ rec.title }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent dark:from-black/80 dark:via-black/20"></div>
+                                    </div>
+                                    
+                                    <!-- Play Button (Visible on Hover) -->
+                                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                                        <div class="w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center dark:bg-primary/80">
+                                            <i class="fas fa-play text-white"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Content Overlay at Bottom -->
+                                    <div class="absolute bottom-0 left-0 right-0 p-4 z-20">
+                                        <h3 class="title text-sm font-semibold text-white mb-2 line-clamp-2">{{ rec.title }}</h3>
+                                        
+                                        <div class="flex justify-between items-center text-xs">
+                                            <span class="text-yellow-300 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-md dark:bg-black/40 dark:text-yellow-300">
+                                                <i class="fas fa-star mr-1"></i> {{ rec.rating }}
+                                            </span>
+                                            <span class="text-gray-300 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-md dark:bg-black/40 dark:text-gray-300">{{ rec.episode }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="bg-black/30 backdrop-blur-md border border-red-500/50 text-red-300 px-4 py-3 rounded-xl mb-8 text-center py-12 dark:bg-black/30 dark:border-red-500/50 dark:text-red-300">
+            <h2 class="text-xl font-bold mb-2">Anime tidak ditemukan</h2>
+            <p>Silakan coba lagi nanti atau kembali ke beranda.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- JavaScript for Local Storage Features -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if anime is in watchlist
+        const animeSlug = '{{ request.path|cut:"/detail_anime/" }}';
+        updateWatchlistButton(animeSlug);
+        updateFavoriteButton(animeSlug);
+        
+        // Add event listeners to episode links for watch history
+        const episodeLinks = document.querySelectorAll('a[href*="detail_episode_video"]');
+        episodeLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                const episodeTitle = this.querySelector('.font-semibold').textContent.trim();
+                const episodeSlug = this.getAttribute('href').split('/').pop();
+                const animeTitle = '{{ anime.title|escapejs }}';
+                const animeCover = '{{ anime.thumbnail_url|escapejs }}';
+                
+                addToWatchHistory(null, animeTitle, animeSlug, episodeSlug, episodeTitle, animeCover);
+            });
+        });
+    });
+    
+    // Watchlist Functions
+    function getWatchlist() {
+        try {
+            const watchlist = localStorage.getItem('kortekstream_watchlist');
+            return watchlist ? JSON.parse(watchlist) : [];
+        } catch (error) {
+            console.error('Error getting watchlist:', error);
+            return [];
+        }
+    }
+    
+    function toggleWatchlist(title, slug, cover) {
+        if (isInWatchlist(slug)) {
+            removeFromWatchlist(slug);
+            updateWatchlistButton(slug, false);
+            showNotification('Dihapus dari watchlist');
+        } else {
+            addToWatchlist(null, title, slug, cover);
+            updateWatchlistButton(slug, true);
+            showNotification('Ditambahkan ke watchlist');
+        }
+    }
+    
+    function addToWatchlist(animeId, title, slug, cover) {
+        try {
+            const watchlist = getWatchlist();
+            
+            // Check if anime is already in watchlist
+            if (!watchlist.some(item => item.slug === slug)) {
+                watchlist.push({
+                    id: animeId || Date.now(),
+                    title: title,
+                    slug: slug,
+                    cover: cover,
+                    addedAt: new Date().toISOString()
+                });
+                
+                localStorage.setItem('kortekstream_watchlist', JSON.stringify(watchlist));
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Error adding to watchlist:', error);
+            return false;
+        }
+    }
+    
+    function removeFromWatchlist(slug) {
+        try {
+            let watchlist = getWatchlist();
+            watchlist = watchlist.filter(item => item.slug !== slug);
+            localStorage.setItem('kortekstream_watchlist', JSON.stringify(watchlist));
+            return true;
+        } catch (error) {
+            console.error('Error removing from watchlist:', error);
+            return false;
+        }
+    }
+    
+    function isInWatchlist(slug) {
+        const watchlist = getWatchlist();
+        return watchlist.some(item => item.slug === slug);
+    }
+    
+    function updateWatchlistButton(slug, isAdded = null) {
+        const btn = document.getElementById('watchlist-btn');
+        const icon = document.getElementById('watchlist-icon');
+        const text = document.getElementById('watchlist-text');
+        
+        if (!btn || !icon || !text) return;
+        
+        const inWatchlist = isAdded !== null ? isAdded : isInWatchlist(slug);
+        
+        if (inWatchlist) {
+            btn.classList.remove('bg-primary/80');
+            btn.classList.add('bg-green-500/80');
+            icon.classList.remove('fa-bookmark');
+            icon.classList.add('fa-check');
+            text.textContent = 'Dalam Watchlist';
+        } else {
+            btn.classList.remove('bg-green-500/80');
+            btn.classList.add('bg-primary/80');
+            icon.classList.remove('fa-check');
+            icon.classList.add('fa-bookmark');
+            text.textContent = 'Tambah ke Watchlist';
+        }
+    }
+    
+    // Favorites Functions
+    function getFavorites() {
+        try {
+            const favorites = localStorage.getItem('kortekstream_favorites');
+            return favorites ? JSON.parse(favorites) : [];
+        } catch (error) {
+            console.error('Error getting favorites:', error);
+            return [];
+        }
+    }
+    
+    function toggleFavorite(title, slug, cover) {
+        if (isInFavorites(slug)) {
+            removeFromFavorites(slug);
+            updateFavoriteButton(slug, false);
+            showNotification('Dihapus dari favorit');
+        } else {
+            addToFavorites(null, title, slug, cover);
+            updateFavoriteButton(slug, true);
+            showNotification('Ditambahkan ke favorit');
+        }
+    }
+    
+    function addToFavorites(animeId, title, slug, cover) {
+        try {
+            const favorites = getFavorites();
+            
+            // Check if anime is already in favorites
+            if (!favorites.some(item => item.slug === slug)) {
+                favorites.push({
+                    id: animeId || Date.now(),
+                    title: title,
+                    slug: slug,
+                    cover: cover,
+                    addedAt: new Date().toISOString()
+                });
+                
+                localStorage.setItem('kortekstream_favorites', JSON.stringify(favorites));
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Error adding to favorites:', error);
+            return false;
+        }
+    }
+    
+    function removeFromFavorites(slug) {
+        try {
+            let favorites = getFavorites();
+            favorites = favorites.filter(item => item.slug !== slug);
+            localStorage.setItem('kortekstream_favorites', JSON.stringify(favorites));
+            return true;
+        } catch (error) {
+            console.error('Error removing from favorites:', error);
+            return false;
+        }
+    }
+    
+    function isInFavorites(slug) {
+        const favorites = getFavorites();
+        return favorites.some(item => item.slug === slug);
+    }
+    
+    function updateFavoriteButton(slug, isAdded = null) {
+        const btn = document.getElementById('favorite-btn');
+        const icon = document.getElementById('favorite-icon');
+        const text = document.getElementById('favorite-text');
+        
+        if (!btn || !icon || !text) return;
+        
+        const inFavorites = isAdded !== null ? isAdded : isInFavorites(slug);
+        
+        if (inFavorites) {
+            btn.classList.remove('bg-black/50');
+            btn.classList.add('bg-red-500/80');
+            icon.classList.remove('far', 'fa-heart');
+            icon.classList.add('fas', 'fa-heart');
+            text.textContent = 'Favorit';
+        } else {
+            btn.classList.remove('bg-red-500/80');
+            btn.classList.add('bg-black/50');
+            icon.classList.remove('fas', 'fa-heart');
+            icon.classList.add('far', 'fa-heart');
+            text.textContent = 'Favorit';
+        }
+    }
+    
+    // Watch History Functions
+    function getWatchHistory() {
+        try {
+            const history = localStorage.getItem('kortekstream_history');
+            return history ? JSON.parse(history) : [];
+        } catch (error) {
+            console.error('Error getting watch history:', error);
+            return [];
+        }
+    }
+    
+    function addToWatchHistory(animeId, title, slug, episodeSlug, episodeTitle, cover) {
+        try {
+            let history = getWatchHistory();
+            
+            // Limit history to 100 items
+            if (history.length >= 100) {
+                history = history.slice(0, 99);
+            }
+            
+            // Add to beginning of array (most recent first)
+            history.unshift({
+                id: animeId || Date.now(),
+                title: title,
+                slug: slug,
+                episodeSlug: episodeSlug,
+                episodeTitle: episodeTitle,
+                cover: cover,
+                watchedAt: new Date().toISOString()
+            });
+            
+            localStorage.setItem('kortekstream_history', JSON.stringify(history));
+        } catch (error) {
+            console.error('Error adding to watch history:', error);
+        }
+    }
+    
+    // Notification Function
+    function showNotification(message) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'fixed bottom-4 right-4 bg-black/70 backdrop-blur-md text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in-up border border-gray-700/50 dark:bg-black/70 dark:border-gray-700/50';
+        notification.textContent = message;
+        
+        // Add to DOM
+        document.body.appendChild(notification);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.classList.add('animate-fade-out');
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 500);
+        }, 3000);
+    }
+</script>
+
+<style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+    
+    .animate-fade-in-up {
+        animation: fadeInUp 0.3s ease-out forwards;
+    }
+    
+    .animate-fade-out {
+        animation: fadeOut 0.5s ease-out forwards;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,929 @@
+{% extends 'streamapp/base.html' %}
+
+{% block title %}{% if episode.title %}{{ episode.title }}{% else %}Detail Episode{% endif %} - KortekStream{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Styling khusus untuk player video */
+    .video-container {
+        position: relative;
+        padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+        height: 0;
+        overflow: hidden;
+        background-color: #000 !important;
+        border-radius: 0.5rem;
+    }
+    
+    .video-container iframe, 
+    .video-container video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .loader {
+        border-top-color: #e74c3c;
+        -webkit-animation: spinner 1.5s linear infinite;
+        animation: spinner 1.5s linear infinite;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3 bg-black/30 backdrop-blur-md px-4 py-2 rounded-lg border border-gray-700/50 dark:bg-black/30">
+            <li class="inline-flex items-center">
+                <a href="{% url 'streamapp:index' %}" class="inline-flex items-center text-sm font-medium text-white hover:text-primary transition-colors">
+                    <i class="fas fa-home mr-2"></i>
+                    Beranda
+                </a>
+            </li>
+            {% if episode.navigation.all_episodes_url %}
+                {% with anime_slug=episode.navigation.all_episodes_url|cut:"https://samehadaku.now/anime/"|cut:"/" %}
+                    <li>
+                        <div class="flex items-center">
+                            <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                            <a href="{% url 'streamapp:detail_anime' anime_slug %}" class="text-sm font-medium text-white hover:text-primary transition-colors">
+                                Anime
+                            </a>
+                        </div>
+                    </li>
+                {% endwith %}
+            {% endif %}
+            <li aria-current="page">
+                <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                    <span class="text-sm font-medium text-gray-300">{% if episode.title %}{{ episode.title }}{% else %}Detail Episode{% endif %}</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+    
+    {% if error %}
+        <div class="bg-black/30 backdrop-blur-md border border-red-500/50 text-red-300 px-4 py-3 rounded-xl mb-8 dark:bg-black/30 dark:border-red-500/50 dark:text-red-300">
+            <p>{{ error }}</p>
+        </div>
+    {% elif episode %}
+        <!-- Episode Header -->
+        <div class="bg-black/30 backdrop-blur-md rounded-xl shadow-lg p-6 mb-6 border border-gray-700/50 dark:bg-black/30">
+            <div class="flex flex-col md:flex-row md:items-start md:justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-white mb-2">{{ episode.title }}</h1>
+                    <div class="text-sm text-gray-400 mb-4">Dirilis: {{ episode.release_info }}</div>
+                </div>
+                
+                <!-- User Action Buttons -->
+                <div class="flex space-x-2 mb-4 md:mb-0">
+                    {% if episode.navigation.all_episodes_url %}
+                        {% with anime_slug=episode.navigation.all_episodes_url|cut:"https://samehadaku.now/anime/"|cut:"/" %}
+                            <button id="favorite-btn" onclick="toggleFavorite('{{ episode.title|escapejs }}', '{{ anime_slug|escapejs }}', '{{ episode.other_episodes.0.thumbnail_url|default:''|escapejs }}')" class="flex items-center px-4 py-2 bg-black/50 backdrop-blur-sm text-white rounded-lg hover:bg-black/70 transition-colors dark:bg-black/50 dark:hover:bg-black/70">
+                                <i id="favorite-icon" class="far fa-heart mr-2"></i>
+                                <span id="favorite-text">Favorit</span>
+                            </button>
+                            
+                            <button id="watchlist-btn" onclick="toggleWatchlist('{{ episode.title|escapejs }}', '{{ anime_slug|escapejs }}', '{{ episode.other_episodes.0.thumbnail_url|default:''|escapejs }}')" class="flex items-center px-4 py-2 bg-primary/80 backdrop-blur-sm text-white rounded-lg hover:bg-primary transition-colors dark:bg-primary/80 dark:hover:bg-primary">
+                                <i id="watchlist-icon" class="fas fa-bookmark mr-2"></i>
+                                <span id="watchlist-text">Tambah ke Watchlist</span>
+                            </button>
+                        {% endwith %}
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Navigation Buttons -->
+            <div class="flex flex-wrap gap-3 mb-4">
+                {% if episode.navigation.previous_episode_url %}
+                    {% with prev_slug=episode.navigation.previous_episode_url|cut:"https://samehadaku.now/"|cut:"/" %}
+                        <a href="{% url 'streamapp:detail_episode_video' prev_slug %}" class="px-4 py-2 bg-primary/80 backdrop-blur-sm text-white rounded-lg hover:bg-primary transition-colors dark:bg-primary/80 dark:hover:bg-primary">
+                            <i class="fas fa-chevron-left mr-1"></i> Episode Sebelumnya
+                        </a>
+                    {% endwith %}
+                {% else %}
+                    <span class="px-4 py-2 bg-black/20 backdrop-blur-md border border-gray-700/30 text-gray-400 rounded-lg cursor-not-allowed dark:bg-black/20 dark:text-gray-400">
+                        <i class="fas fa-chevron-left mr-1"></i> Episode Sebelumnya
+                    </span>
+                {% endif %}
+                
+                {% if episode.navigation.all_episodes_url %}
+                    {% with anime_slug=episode.navigation.all_episodes_url|cut:"https://samehadaku.now/anime/"|cut:"/" %}
+                        <a href="{% url 'streamapp:detail_anime' anime_slug %}" class="px-4 py-2 bg-primary/80 backdrop-blur-sm text-white rounded-lg hover:bg-primary transition-colors dark:bg-primary/80 dark:hover:bg-primary">
+                            <i class="fas fa-list mr-1"></i> Semua Episode
+                        </a>
+                    {% endwith %}
+                {% endif %}
+                
+                {% if episode.navigation.next_episode_url %}
+                    {% with next_slug=episode.navigation.next_episode_url|cut:"https://samehadaku.now/"|cut:"/" %}
+                        <a href="{% url 'streamapp:detail_episode_video' next_slug %}" class="px-4 py-2 bg-primary/80 backdrop-blur-sm text-white rounded-lg hover:bg-primary transition-colors dark:bg-primary/80 dark:hover:bg-primary">
+                            Episode Selanjutnya <i class="fas fa-chevron-right ml-1"></i>
+                        </a>
+                    {% endwith %}
+                {% else %}
+                    <span class="px-4 py-2 bg-black/20 backdrop-blur-md border border-gray-700/30 text-gray-400 rounded-lg cursor-not-allowed dark:bg-black/20 dark:text-gray-400">
+                        Episode Selanjutnya <i class="fas fa-chevron-right ml-1"></i>
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Video Player -->
+        <div class="bg-black/30 backdrop-blur-md rounded-xl shadow-lg p-6 mb-8 border border-gray-700/50 dark:bg-black/30">
+            <div class="video-container mb-6 rounded-lg overflow-hidden" id="player-frame">
+                {% if episode.streaming_servers %}
+                    <!-- Default server akan dipilih oleh JavaScript -->
+                    <div class="flex justify-center items-center h-full flex-col bg-black/70 text-white dark:bg-black/70">
+                        <p>Silakan pilih server streaming di bawah ini.</p>
+                    </div>
+                {% else %}
+                    <div class="flex justify-center items-center h-full flex-col bg-black/70 text-white dark:bg-black/70">
+                        <p>Tidak ada server streaming yang tersedia.</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            {% if episode.streaming_servers %}
+                <div class="flex flex-wrap gap-3 mb-4">
+                    {% for server in episode.streaming_servers %}
+                        {% if "Nakama" in server.server_name %}
+                            <!-- Prioritaskan server Nakama -->
+                            <button class="px-4 py-2 bg-black/50 backdrop-blur-sm text-white rounded-lg hover:bg-primary/60 transition-colors border border-gray-700/50 dark:bg-black/50 dark:hover:bg-primary/60"
+                                    data-url="{{ server.streaming_url }}"
+                                    data-server-type="nakama"
+                                    onclick="changeServer(this)">
+                                {{ server.server_name }}
+                            </button>
+                        {% elif "Pucuk" in server.server_name %}
+                            <button class="px-4 py-2 bg-black/50 backdrop-blur-sm text-white rounded-lg hover:bg-primary/60 transition-colors border border-gray-700/50 dark:bg-black/50 dark:hover:bg-primary/60"
+                                    data-url="{{ server.streaming_url }}"
+                                    data-server-type="pucuk"
+                                    onclick="changeServer(this)">
+                                {{ server.server_name }}
+                            </button>
+                        {% elif "Premium" in server.server_name %}
+                            <button class="px-4 py-2 bg-black/50 backdrop-blur-sm text-white rounded-lg hover:bg-primary/60 transition-colors border border-gray-700/50 dark:bg-black/50 dark:hover:bg-primary/60"
+                                    data-url="{{ server.streaming_url }}"
+                                    data-server-type="premium"
+                                    onclick="changeServer(this)">
+                                {{ server.server_name }}
+                            </button>
+                        {% elif "Mega" in server.server_name %}
+                            <button class="px-4 py-2 bg-black/50 backdrop-blur-sm text-white rounded-lg hover:bg-primary/60 transition-colors border border-gray-700/50 dark:bg-black/50 dark:hover:bg-primary/60"
+                                    data-url="{{ server.streaming_url }}"
+                                    data-server-type="mega"
+                                    onclick="changeServer(this)">
+                                {{ server.server_name }}
+                            </button>
+                        {% elif "Blogspot" in server.server_name %}
+                            <button class="px-4 py-2 bg-black/50 backdrop-blur-sm text-white rounded-lg hover:bg-primary/60 transition-colors border border-gray-700/50 dark:bg-black/50 dark:hover:bg-primary/60"
+                                    data-url="{{ server.streaming_url }}"
+                                    data-server-type="blogspot"
+                                    onclick="changeServer(this)">
+                                {{ server.server_name }}
+                            </button>
+                        {% else %}
+                            <button class="px-4 py-2 bg-black/50 backdrop-blur-sm text-white rounded-lg hover:bg-primary/60 transition-colors border border-gray-700/50 dark:bg-black/50 dark:hover:bg-primary/60"
+                                    data-url="{{ server.streaming_url }}"
+                                    data-server-type="other"
+                                    onclick="changeServer(this)">
+                                {{ server.server_name }}
+                            </button>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Anime Info -->
+        {% if episode.anime_info %}
+            <div class="bg-black/30 backdrop-blur-md rounded-xl shadow-lg p-6 mb-8 border border-gray-700/50 dark:bg-black/30">
+                <h2 class="text-xl font-bold text-white mb-4 pb-2 border-b border-gray-700/50">Informasi Anime</h2>
+                <h3 class="text-lg font-semibold text-white mb-2">{{ episode.anime_info.title }}</h3>
+                <p class="text-gray-300 mb-4">{{ episode.anime_info.synopsis }}</p>
+                
+                {% if episode.anime_info.genres %}
+                    <div class="flex flex-wrap gap-2">
+                        {% for genre in episode.anime_info.genres %}
+                            <span class="bg-primary/40 backdrop-blur-sm text-white px-2 py-1 rounded-md text-sm dark:bg-primary/40">{{ genre }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+        
+        <!-- Other Episodes -->
+        {% if episode.other_episodes %}
+            <div class="bg-black/30 backdrop-blur-md rounded-xl shadow-lg p-6 mb-8 border border-gray-700/50 dark:bg-black/30">
+                <h2 class="text-xl font-bold text-white mb-4 pb-2 border-b border-gray-700/50">Episode Lainnya</h2>
+                
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {% for ep in episode.other_episodes %}
+                        <div class="anime-card dynamic-border group relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 dark:shadow-lg dark:hover:shadow-xl">
+                            {% with ep_slug=ep.url|cut:"https://samehadaku.now/"|cut:"/" %}
+                                <a href="{% url 'streamapp:detail_episode_video' ep_slug %}" class="block">
+                                    <!-- Card Background with Blur Effect -->
+                                    <div class="absolute inset-0 bg-black/20 backdrop-blur-md rounded-xl z-0 dark:bg-black/20"></div>
+                                    
+                                    <!-- Image Container -->
+                                    <div class="relative pb-[56.25%] overflow-hidden z-10">
+                                        <!-- Image with Gradient Overlay -->
+                                        <div class="absolute inset-0 w-full h-full">
+                                            <img src="{{ ep.thumbnail_url }}" alt="{{ ep.title }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent dark:from-black/80 dark:via-black/20"></div>
+                                        </div>
+                                        
+                                        <!-- Play Button (Visible on Hover) -->
+                                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                                            <div class="w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center dark:bg-primary/80">
+                                                <i class="fas fa-play text-white"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Content Overlay at Bottom -->
+                                        <div class="absolute bottom-0 left-0 right-0 p-3 z-20">
+                                            <h3 class="title text-sm font-semibold text-white mb-1 line-clamp-2">{{ ep.title }}</h3>
+                                            <div class="text-xs text-gray-300">{{ ep.release_date }}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            {% endwith %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Download Links -->
+        {% if episode.download_links %}
+            <div class="bg-black/30 backdrop-blur-md rounded-xl shadow-lg p-6 mb-8 border border-gray-700/50 dark:bg-black/30">
+                <h2 class="text-xl font-bold text-white mb-4 pb-2 border-b border-gray-700/50">Download Links</h2>
+                
+                {% for format_type, resolutions in episode.download_links.items %}
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-white mb-3 pb-1 border-b border-gray-700/30 dark:border-gray-700/30">{{ format_type }}</h3>
+                        
+                        {% for resolution, providers in resolutions.items %}
+                            <div class="mb-4">
+                                <h4 class="text-md font-medium text-gray-300 mb-2">{{ resolution }}</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    {% for provider in providers %}
+                                        <a href="{{ provider.url }}" class="px-3 py-1 bg-primary/80 backdrop-blur-sm text-white text-sm rounded-lg hover:bg-primary transition-colors border border-primary/30 dark:bg-primary/80 dark:hover:bg-primary dark:border-primary/30" target="_blank">
+                                            {{ provider.provider }}
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="bg-black/30 backdrop-blur-md border border-red-500/50 text-red-300 px-4 py-3 rounded-xl mb-8 text-center py-12 dark:bg-black/30 dark:border-red-500/50 dark:text-red-300">
+            <h2 class="text-xl font-bold mb-2">Data episode tidak ditemukan</h2>
+            <p>Silakan coba lagi nanti atau kembali ke beranda.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Tambahkan episode ke watch history saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', function() {
+        // Dapatkan informasi anime dan episode
+        {% if episode.navigation.all_episodes_url %}
+            {% with anime_slug=episode.navigation.all_episodes_url|cut:"https://samehadaku.now/anime/"|cut:"/" %}
+                const animeSlug = '{{ anime_slug }}';
+                const animeTitle = '{{ episode.title|escapejs }}'.split(' Episode')[0];
+                const episodeSlug = '{{ request.path|cut:"/detail_episode_video/" }}';
+                const episodeTitle = '{{ episode.title|escapejs }}';
+                const animeCover = '{{ episode.other_episodes.0.thumbnail_url|default:""|escapejs }}';
+                
+                // Tambahkan ke watch history
+                addToWatchHistory(null, animeTitle, animeSlug, episodeSlug, episodeTitle, animeCover);
+                
+                // Periksa status watchlist dan favorite
+                updateWatchlistButton(animeSlug);
+                updateFavoriteButton(animeSlug);
+                
+                // Tampilkan notifikasi
+                showNotification('Ditambahkan ke riwayat tontonan');
+            {% endwith %}
+        {% endif %}
+    });
+    
+    // Watchlist Functions
+    function getWatchlist() {
+        try {
+            const watchlist = localStorage.getItem('kortekstream_watchlist');
+            return watchlist ? JSON.parse(watchlist) : [];
+        } catch (error) {
+            console.error('Error getting watchlist:', error);
+            return [];
+        }
+    }
+    
+    function toggleWatchlist(title, slug, cover) {
+        if (isInWatchlist(slug)) {
+            removeFromWatchlist(slug);
+            updateWatchlistButton(slug, false);
+            showNotification('Dihapus dari watchlist');
+        } else {
+            addToWatchlist(null, title, slug, cover);
+            updateWatchlistButton(slug, true);
+            showNotification('Ditambahkan ke watchlist');
+        }
+    }
+    
+    function addToWatchlist(animeId, title, slug, cover) {
+        try {
+            const watchlist = getWatchlist();
+            
+            // Check if anime is already in watchlist
+            if (!watchlist.some(item => item.slug === slug)) {
+                watchlist.push({
+                    id: animeId || Date.now(),
+                    title: title,
+                    slug: slug,
+                    cover: cover,
+                    addedAt: new Date().toISOString()
+                });
+                
+                localStorage.setItem('kortekstream_watchlist', JSON.stringify(watchlist));
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Error adding to watchlist:', error);
+            return false;
+        }
+    }
+    
+    function removeFromWatchlist(slug) {
+        try {
+            let watchlist = getWatchlist();
+            watchlist = watchlist.filter(item => item.slug !== slug);
+            localStorage.setItem('kortekstream_watchlist', JSON.stringify(watchlist));
+            return true;
+        } catch (error) {
+            console.error('Error removing from watchlist:', error);
+            return false;
+        }
+    }
+    
+    function isInWatchlist(slug) {
+        const watchlist = getWatchlist();
+        return watchlist.some(item => item.slug === slug);
+    }
+    
+    function updateWatchlistButton(slug, isAdded = null) {
+        const btn = document.getElementById('watchlist-btn');
+        const icon = document.getElementById('watchlist-icon');
+        const text = document.getElementById('watchlist-text');
+        
+        if (!btn || !icon || !text) return;
+        
+        const inWatchlist = isAdded !== null ? isAdded : isInWatchlist(slug);
+        
+        if (inWatchlist) {
+            btn.classList.remove('bg-primary/80');
+            btn.classList.add('bg-green-500/80');
+            icon.classList.remove('fa-bookmark');
+            icon.classList.add('fa-check');
+            text.textContent = 'Dalam Watchlist';
+        } else {
+            btn.classList.remove('bg-green-500/80');
+            btn.classList.add('bg-primary/80');
+            icon.classList.remove('fa-check');
+            icon.classList.add('fa-bookmark');
+            text.textContent = 'Tambah ke Watchlist';
+        }
+    }
+    
+    // Favorites Functions
+    function getFavorites() {
+        try {
+            const favorites = localStorage.getItem('kortekstream_favorites');
+            return favorites ? JSON.parse(favorites) : [];
+        } catch (error) {
+            console.error('Error getting favorites:', error);
+            return [];
+        }
+    }
+    
+    function toggleFavorite(title, slug, cover) {
+        if (isInFavorites(slug)) {
+            removeFromFavorites(slug);
+            updateFavoriteButton(slug, false);
+            showNotification('Dihapus dari favorit');
+        } else {
+            addToFavorites(null, title, slug, cover);
+            updateFavoriteButton(slug, true);
+            showNotification('Ditambahkan ke favorit');
+        }
+    }
+    
+    function addToFavorites(animeId, title, slug, cover) {
+        try {
+            const favorites = getFavorites();
+            
+            // Check if anime is already in favorites
+            if (!favorites.some(item => item.slug === slug)) {
+                favorites.push({
+                    id: animeId || Date.now(),
+                    title: title,
+                    slug: slug,
+                    cover: cover,
+                    addedAt: new Date().toISOString()
+                });
+                
+                localStorage.setItem('kortekstream_favorites', JSON.stringify(favorites));
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Error adding to favorites:', error);
+            return false;
+        }
+    }
+    
+    function removeFromFavorites(slug) {
+        try {
+            let favorites = getFavorites();
+            favorites = favorites.filter(item => item.slug !== slug);
+            localStorage.setItem('kortekstream_favorites', JSON.stringify(favorites));
+            return true;
+        } catch (error) {
+            console.error('Error removing from favorites:', error);
+            return false;
+        }
+    }
+    
+    function isInFavorites(slug) {
+        const favorites = getFavorites();
+        return favorites.some(item => item.slug === slug);
+    }
+    
+    function updateFavoriteButton(slug, isAdded = null) {
+        const btn = document.getElementById('favorite-btn');
+        const icon = document.getElementById('favorite-icon');
+        const text = document.getElementById('favorite-text');
+        
+        if (!btn || !icon || !text) return;
+        
+        const inFavorites = isAdded !== null ? isAdded : isInFavorites(slug);
+        
+        if (inFavorites) {
+            btn.classList.remove('bg-black/50');
+            btn.classList.add('bg-red-500/80');
+            icon.classList.remove('far', 'fa-heart');
+            icon.classList.add('fas', 'fa-heart');
+            text.textContent = 'Favorit';
+        } else {
+            btn.classList.remove('bg-red-500/80');
+            btn.classList.add('bg-black/50');
+            icon.classList.remove('fas', 'fa-heart');
+            icon.classList.add('far', 'fa-heart');
+            text.textContent = 'Favorit';
+        }
+    }
+    
+    // Watch History Functions
+    function getWatchHistory() {
+        try {
+            const history = localStorage.getItem('kortekstream_history');
+            return history ? JSON.parse(history) : [];
+        } catch (error) {
+            console.error('Error getting watch history:', error);
+            return [];
+        }
+    }
+    
+    function addToWatchHistory(animeId, title, slug, episodeSlug, episodeTitle, cover) {
+        try {
+            let history = getWatchHistory();
+            
+            // Limit history to 100 items
+            if (history.length >= 100) {
+                history = history.slice(0, 99);
+            }
+            
+            // Check if this episode is already in history
+            const existingIndex = history.findIndex(item => item.episodeSlug === episodeSlug);
+            if (existingIndex !== -1) {
+                // Remove the existing entry
+                history.splice(existingIndex, 1);
+            }
+            
+            // Add to beginning of array (most recent first)
+            history.unshift({
+                id: animeId || Date.now(),
+                title: title,
+                slug: slug,
+                episodeSlug: episodeSlug,
+                episodeTitle: episodeTitle,
+                cover: cover,
+                watchedAt: new Date().toISOString()
+            });
+            
+            localStorage.setItem('kortekstream_history', JSON.stringify(history));
+        } catch (error) {
+            console.error('Error adding to watch history:', error);
+        }
+    }
+    
+    function clearWatchHistory() {
+        try {
+            localStorage.removeItem('kortekstream_history');
+            return true;
+        } catch (error) {
+            console.error('Error clearing watch history:', error);
+            return false;
+        }
+    }
+    
+    // Notification Function
+    function showNotification(message) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'fixed bottom-4 right-4 bg-black/70 backdrop-blur-md text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in-up border border-gray-700/50 dark:bg-black/70 dark:border-gray-700/50';
+        notification.textContent = message;
+        
+        // Add to DOM
+        document.body.appendChild(notification);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.classList.add('animate-fade-out');
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 500);
+        }, 3000);
+    }
+    // Fungsi untuk menampilkan pesan error di player
+    function showErrorMessage(message) {
+        const playerFrame = document.getElementById('player-frame');
+        playerFrame.innerHTML = `
+            <div class="flex justify-center items-center h-full flex-col bg-black/70 text-white dark:bg-black/70">
+                <p class="text-lg mb-2">⚠️ ${message}</p>
+                <p class="text-sm">Silakan coba server streaming lainnya.</p>
+            </div>
+        `;
+    }
+    
+    // Fungsi untuk menangani server Mega
+    function handleMegaServer(url) {
+        // Mega memerlukan penanganan khusus karena sering "File no longer accessible"
+        const playerFrame = document.getElementById('player-frame');
+        
+        try {
+            // Buat iframe baru dengan parameter tambahan
+            const newIframe = document.createElement('iframe');
+            newIframe.src = url;
+            newIframe.setAttribute('allowfullscreen', 'true');
+            newIframe.setAttribute('webkitallowfullscreen', 'true');
+            newIframe.setAttribute('mozallowfullscreen', 'true');
+            newIframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
+            
+            // Hapus konten lama dan tambahkan iframe baru
+            playerFrame.innerHTML = '';
+            playerFrame.appendChild(newIframe);
+            
+            // Tambahkan event listener untuk mendeteksi error
+            newIframe.onerror = function() {
+                showErrorMessage("Server Mega tidak dapat diakses. File mungkin sudah tidak tersedia.");
+            };
+            
+            // Tambahkan pesan fallback jika iframe tidak dimuat dalam 5 detik
+            setTimeout(function() {
+                try {
+                    if (newIframe.contentDocument &&
+                        (newIframe.contentDocument.body.innerHTML === '' ||
+                         newIframe.contentDocument.body.innerHTML.includes('no longer accessible'))) {
+                        showErrorMessage("Server Mega tidak merespons atau file tidak tersedia. Coba server lain.");
+                    }
+                } catch (e) {
+                    // Kesalahan cross-origin bisa diabaikan
+                    console.log("Cross-origin check failed, this is normal for Mega");
+                }
+            }, 5000);
+        } catch (error) {
+            console.error("Error loading Mega server:", error);
+            showErrorMessage("Gagal memuat server Mega. Coba server lain.");
+        }
+    }
+    
+    // Fungsi untuk menangani server Premium
+    function handlePremiumServer(url) {
+        const playerFrame = document.getElementById('player-frame');
+        
+        try {
+            // Periksa apakah URL berakhir dengan .mp4
+            if (url.endsWith('.mp4')) {
+                // Jika URL adalah file MP4 langsung, gunakan tag video
+                playerFrame.innerHTML = `
+                    <video controls style="width: 100%; height: 100%;" autoplay>
+                        <source src="${url}" type="video/mp4">
+                        Browser Anda tidak mendukung tag video.
+                    </video>
+                `;
+                
+                // Tambahkan event listener untuk mendeteksi error pada video
+                const videoElement = playerFrame.querySelector('video');
+                videoElement.onerror = function() {
+                    showErrorMessage("Gagal memuat video dari server Premium. Coba server lain.");
+                };
+            } else {
+                // Jika bukan file MP4 langsung, gunakan iframe dengan parameter tambahan
+                const newIframe = document.createElement('iframe');
+                newIframe.src = url;
+                newIframe.setAttribute('allowfullscreen', 'true');
+                newIframe.setAttribute('webkitallowfullscreen', 'true');
+                newIframe.setAttribute('mozallowfullscreen', 'true');
+                newIframe.setAttribute('referrerpolicy', 'no-referrer');
+                newIframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
+                
+                // Hapus konten lama dan tambahkan iframe baru
+                playerFrame.innerHTML = '';
+                playerFrame.appendChild(newIframe);
+                
+                // Tambahkan event listener untuk mendeteksi error
+                newIframe.onerror = function() {
+                    showErrorMessage("Gagal memuat server Premium. Coba server lain.");
+                };
+                
+                // Periksa apakah iframe berisi pesan error dari Premium
+                setTimeout(function() {
+                    try {
+                        if (newIframe.contentDocument &&
+                            newIframe.contentDocument.body.innerHTML.includes('Please access the embed page using an iframe')) {
+                            showErrorMessage("Server Premium memerlukan akses melalui iframe. Coba server lain.");
+                        }
+                    } catch (e) {
+                        // Kesalahan cross-origin bisa diabaikan
+                        console.log("Cross-origin check failed, this is normal for Premium");
+                    }
+                }, 3000);
+            }
+        } catch (error) {
+            console.error("Error loading Premium server:", error);
+            showErrorMessage("Gagal memuat server Premium. Coba server lain.");
+        }
+    }
+    
+    // Fungsi untuk menangani server Nakama
+    function handleNakamaServer(url) {
+        const playerFrame = document.getElementById('player-frame');
+        
+        try {
+            // Buat iframe baru dengan parameter tambahan
+            const newIframe = document.createElement('iframe');
+            newIframe.src = url;
+            newIframe.setAttribute('allowfullscreen', 'true');
+            newIframe.setAttribute('webkitallowfullscreen', 'true');
+            newIframe.setAttribute('mozallowfullscreen', 'true');
+            
+            // Hapus konten lama dan tambahkan iframe baru
+            playerFrame.innerHTML = '';
+            playerFrame.appendChild(newIframe);
+            
+            // Tambahkan event listener untuk mendeteksi error
+            newIframe.onerror = function() {
+                showErrorMessage("Gagal memuat server Nakama. Coba server lain.");
+            };
+        } catch (error) {
+            console.error("Error loading Nakama server:", error);
+            showErrorMessage("Gagal memuat server Nakama. Coba server lain.");
+        }
+    }
+    
+    // Fungsi untuk menangani server Pucuk
+    function handlePucukServer(url) {
+        const playerFrame = document.getElementById('player-frame');
+        
+        try {
+            // Buat iframe baru dengan parameter tambahan
+            const newIframe = document.createElement('iframe');
+            newIframe.src = url;
+            newIframe.setAttribute('allowfullscreen', 'true');
+            newIframe.setAttribute('webkitallowfullscreen', 'true');
+            newIframe.setAttribute('mozallowfullscreen', 'true');
+            
+            // Hapus konten lama dan tambahkan iframe baru
+            playerFrame.innerHTML = '';
+            playerFrame.appendChild(newIframe);
+            
+            // Tambahkan event listener untuk mendeteksi error
+            newIframe.onerror = function() {
+                showErrorMessage("Gagal memuat server Pucuk. Coba server lain.");
+            };
+        } catch (error) {
+            console.error("Error loading Pucuk server:", error);
+            showErrorMessage("Gagal memuat server Pucuk. Coba server lain.");
+        }
+    }
+    
+    // Fungsi untuk menangani server Blogspot
+    function handleBlogspotServer(url) {
+        const playerFrame = document.getElementById('player-frame');
+        
+        try {
+            // Periksa apakah URL berakhir dengan .mp4
+            if (url.endsWith('.mp4')) {
+                // Jika URL adalah file MP4 langsung, gunakan tag video
+                playerFrame.innerHTML = `
+                    <video controls style="width: 100%; height: 100%;" autoplay>
+                        <source src="${url}" type="video/mp4">
+                        Browser Anda tidak mendukung tag video.
+                    </video>
+                `;
+                
+                // Tambahkan event listener untuk mendeteksi error pada video
+                const videoElement = playerFrame.querySelector('video');
+                videoElement.onerror = function() {
+                    showErrorMessage("Gagal memuat video dari server Blogspot. Coba server lain.");
+                };
+            } else {
+                // Jika bukan file MP4 langsung, gunakan iframe
+                const newIframe = document.createElement('iframe');
+                newIframe.src = url;
+                newIframe.setAttribute('allowfullscreen', 'true');
+                newIframe.setAttribute('webkitallowfullscreen', 'true');
+                newIframe.setAttribute('mozallowfullscreen', 'true');
+                
+                // Hapus konten lama dan tambahkan iframe baru
+                playerFrame.innerHTML = '';
+                playerFrame.appendChild(newIframe);
+                
+                // Tambahkan event listener untuk mendeteksi error
+                newIframe.onerror = function() {
+                    showErrorMessage("Gagal memuat server Blogspot. Coba server lain.");
+                };
+            }
+        } catch (error) {
+            console.error("Error loading Blogspot server:", error);
+            showErrorMessage("Gagal memuat server Blogspot. Coba server lain.");
+        }
+    }
+    
+    // Fungsi utama untuk mengubah server
+    function changeServer(button) {
+        // Hapus kelas active dari semua tombol
+        document.querySelectorAll('[data-server-type]').forEach(btn => {
+            btn.classList.remove('bg-primary/60');
+            btn.classList.add('bg-black/50');
+        });
+        
+        // Tambahkan kelas active ke tombol yang diklik
+        button.classList.remove('bg-black/50');
+        button.classList.add('bg-primary/60');
+        
+        // Dapatkan URL dan tipe server
+        const url = button.getAttribute('data-url');
+        const serverType = button.getAttribute('data-server-type');
+        
+        // Tampilkan pesan loading
+        const playerFrame = document.getElementById('player-frame');
+        playerFrame.innerHTML = `
+            <div class="flex justify-center items-center h-full flex-col bg-black/70 text-white dark:bg-black/70">
+                <p class="text-lg mb-4">Memuat server ${button.textContent.trim()}...</p>
+                <div class="w-10 h-10 border-4 border-gray-600 border-t-primary rounded-full animate-spin"></div>
+            </div>
+        `;
+        
+        // Tangani berbagai jenis server
+        switch(serverType) {
+            case 'mega':
+                handleMegaServer(url);
+                break;
+                
+            case 'premium':
+                handlePremiumServer(url);
+                break;
+                
+            case 'nakama':
+                handleNakamaServer(url);
+                break;
+                
+            case 'pucuk':
+                handlePucukServer(url);
+                break;
+                
+            case 'blogspot':
+                handleBlogspotServer(url);
+                break;
+                
+            default:
+                // Untuk server lain, gunakan iframe standar
+                try {
+                    const newIframe = document.createElement('iframe');
+                    newIframe.src = url;
+                    newIframe.setAttribute('allowfullscreen', 'true');
+                    newIframe.setAttribute('webkitallowfullscreen', 'true');
+                    newIframe.setAttribute('mozallowfullscreen', 'true');
+                    
+                    // Hapus konten lama dan tambahkan iframe baru
+                    setTimeout(() => {
+                        playerFrame.innerHTML = '';
+                        playerFrame.appendChild(newIframe);
+                    }, 500);
+                    
+                    // Tambahkan event listener untuk mendeteksi error
+                    newIframe.onerror = function() {
+                        showErrorMessage(`Gagal memuat server ${button.textContent.trim()}. Coba server lain.`);
+                    };
+                } catch (error) {
+                    console.error("Error loading server:", error);
+                    showErrorMessage(`Gagal memuat server ${button.textContent.trim()}. Coba server lain.`);
+                }
+                break;
+        }
+    }
+    
+    // Pilih server default saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', function() {
+        // Urutan prioritas: Nakama > Pucuk > Blogspot > Premium > Mega > yang lain
+        
+        // Coba pilih server Nakama terlebih dahulu
+        const nakamaButton = document.querySelector('[data-server-type="nakama"]');
+        if (nakamaButton) {
+            nakamaButton.click();
+            return;
+        }
+        
+        // Jika tidak ada server Nakama, coba server Pucuk
+        const pucukButton = document.querySelector('[data-server-type="pucuk"]');
+        if (pucukButton) {
+            pucukButton.click();
+            return;
+        }
+        
+        // Jika tidak ada server Pucuk, coba server Blogspot
+        const blogspotButton = document.querySelector('[data-server-type="blogspot"]');
+        if (blogspotButton) {
+            blogspotButton.click();
+            return;
+        }
+        
+        // Jika tidak ada server Blogspot, coba server Premium
+        const premiumButton = document.querySelector('[data-server-type="premium"]');
+        if (premiumButton) {
+            premiumButton.click();
+            return;
+        }
+        
+        // Jika tidak ada server Premium, coba server Mega
+        const megaButton = document.querySelector('[data-server-type="mega"]');
+        if (megaButton) {
+            megaButton.click();
+            return;
+        }
+        
+        // Jika tidak ada server yang diutamakan, pilih server pertama
+        const firstButton = document.querySelector('[data-server-type]');
+        if (firstButton) {
+            firstButton.click();
+        }
+    });
+</script>
+
+<style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+    
+    .animate-fade-in-up {
+        animation: fadeInUp 0.3s ease-out forwards;
+    }
+    
+    .animate-fade-out {
+        animation: fadeOut 0.5s ease-out forwards;
+    }
+</style>
+{% endblock %}

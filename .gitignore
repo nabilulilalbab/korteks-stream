@@ -1,0 +1,96 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pytmp
+
+# Virtual environment
+env/
+venv/
+ENV/
+.venv/
+env.bak/
+venv.bak/
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static_root/
+static/
+*.mo
+*.swp
+*.swo
+
+# If you are using dotenv to store secrets
+.env
+.env.*
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# macOS
+.DS_Store
+
+# Linux
+*~
+
+# Migrations (optional, but often ignored in early development)
+**/migrations/*.py
+!**/migrations/__init__.py
+
+# Gunicorn logs
+gunicorn.pid
+
+# Coverage reports
+htmlcov/
+.coverage
+.tox/
+.nox/
+.cache/
+coverage.xml
+nosetests.xml
+*.cover
+
+# pytest
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# celery
+celerybeat-schedule
+celerybeat.pid
+
+# Systemd
+*.service
+*.socket
+
+# Docker
+*.pid
+*.seed
+docker-compose.override.yml
+
+# Node stuff (if using Tailwind/webpack)
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Build
+build/
+dist/
+*.egg-info/
+.eggs/

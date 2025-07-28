@@ -1,0 +1,217 @@
+{% extends 'streamapp/base.html' %}
+
+{% block title %}Jadwal Rilis Anime - KortekStream{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3 bg-black/30 backdrop-blur-md px-4 py-2 rounded-lg border border-gray-700/50 dark:bg-black/30">
+            <li class="inline-flex items-center">
+                <a href="{% url 'streamapp:index' %}" class="inline-flex items-center text-sm font-medium text-white hover:text-primary transition-colors">
+                    <i class="fas fa-home mr-2"></i>
+                    Beranda
+                </a>
+            </li>
+            <li aria-current="page">
+                <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                    <span class="text-sm font-medium text-gray-300">Jadwal Rilis Anime</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="mb-8 bg-gradient-to-r from-primary/80 to-black/60 backdrop-blur-md p-6 rounded-xl border border-gray-700/50 dark:from-primary/80 dark:to-black/60">
+        <h1 class="text-3xl font-bold text-white">Jadwal Rilis Anime</h1>
+        <p class="text-gray-300 mt-2">Jadwal lengkap rilis anime terbaru setiap hari</p>
+    </div>
+
+    {% if error %}
+        <div class="bg-red-100 dark:bg-red-900 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg mb-8 dark:bg-red-900 dark:border-red-800 dark:text-red-300">
+            <p>{{ error }}</p>
+        </div>
+    {% else %}
+        <!-- Day Tabs -->
+        <div class="flex flex-wrap justify-center mb-8 overflow-x-auto pb-2">
+            <a href="{% url 'streamapp:all_list_jadwal_rilis' %}" class="px-4 py-2 m-1 rounded-full border {% if not selected_day %}bg-primary/80 backdrop-blur-md border-primary/50 text-white dark:bg-primary/80 dark:border-primary/50{% else %}bg-black/30 backdrop-blur-md border-gray-700/50 text-white hover:bg-primary/60 hover:border-primary/30 dark:bg-black/30 dark:hover:bg-primary/60 dark:hover:border-primary/30{% endif %} transition-colors">
+                Semua Hari
+            </a>
+            {% for day in days_of_week %}
+                <a href="{% url 'streamapp:all_list_jadwal_rilis' %}?day={{ day|lower }}" class="px-4 py-2 m-1 rounded-full border {% if selected_day == day %}bg-primary/80 backdrop-blur-md border-primary/50 text-white dark:bg-primary/80 dark:border-primary/50{% else %}bg-black/30 backdrop-blur-md border-gray-700/50 text-white hover:bg-primary/60 hover:border-primary/30 dark:bg-black/30 dark:hover:bg-primary/60 dark:hover:border-primary/30{% endif %} transition-colors">
+                    {{ day }}
+                </a>
+            {% endfor %}
+        </div>
+        
+        {% if selected_day %}
+            <!-- Tampilkan jadwal untuk satu hari -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-gray-700/50 bg-black/30 backdrop-blur-md p-3 rounded-t-lg dark:bg-black/30 dark:border-gray-700/50">{{ selected_day }}</h2>
+                
+                {% if jadwal_data.data %}
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                        {% for anime in jadwal_data.data %}
+                            <div class="anime-card dynamic-border group relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 dark:shadow-lg dark:hover:shadow-xl">
+                                {% if anime.anime_slug %}
+                                    <a href="{% url 'streamapp:detail_anime' anime.anime_slug %}" class="block">
+                                {% else %}
+                                    <div class="block">
+                                {% endif %}
+                                        <!-- Card Background with Blur Effect -->
+                                        <div class="absolute inset-0 bg-black/20 backdrop-blur-md rounded-xl z-0 dark:bg-black/20"></div>
+                                        
+                                        <!-- Image Container -->
+                                        <div class="relative pb-[140%] overflow-hidden z-10">
+                                            <!-- Image with Gradient Overlay -->
+                                            <div class="absolute inset-0 w-full h-full">
+                                                <img src="{{ anime.cover_url }}" alt="{{ anime.title }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent dark:from-black/80 dark:via-black/20"></div>
+                                            </div>
+                                            
+                                            <!-- Play Button (Visible on Hover) -->
+                                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                                                <div class="w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center dark:bg-primary/80">
+                                                    <i class="fas fa-play text-white"></i>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Type Badge -->
+                                            <div class="absolute top-2 right-2 bg-primary/80 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-md z-20 dark:bg-primary/80">
+                                                {{ anime.type }}
+                                            </div>
+                                            
+                                            <!-- Score Badge -->
+                                            {% if anime.score %}
+                                                <div class="absolute bottom-2 right-2 bg-yellow-500/80 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-md flex items-center z-20 dark:bg-yellow-500/80">
+                                                    <i class="fas fa-star mr-1"></i>
+                                                    {{ anime.score }}
+                                                </div>
+                                            {% endif %}
+                                            
+                                            <!-- Content Overlay at Bottom -->
+                                            <div class="absolute bottom-0 left-0 right-0 p-4 z-20">
+                                                <h3 class="title text-sm font-semibold text-white mb-2 line-clamp-2">{{ anime.title }}</h3>
+                                                
+                                                <!-- Genres -->
+                                                <div class="flex flex-wrap gap-1 mb-2">
+                                                    {% for genre in anime.genres|slice:":2" %}
+                                                        <span class="text-xs bg-primary/40 backdrop-blur-sm text-white px-2 py-0.5 rounded-md dark:bg-primary/40">{{ genre }}</span>
+                                                    {% endfor %}
+                                                    {% if anime.genres|length > 2 %}
+                                                        <span class="text-xs bg-black/40 backdrop-blur-sm text-white px-2 py-0.5 rounded-md dark:bg-black/40">+{{ anime.genres|length|add:"-2" }}</span>
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                <div class="text-xs text-gray-300 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-md inline-flex items-center dark:bg-black/40 dark:text-gray-300">
+                                                    <i class="far fa-clock mr-1"></i> {{ anime.release_time }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                {% if anime.anime_slug %}
+                                    </a>
+                                {% else %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% empty %}
+                            <div class="col-span-full bg-black/30 backdrop-blur-md rounded-lg p-6 text-center border border-gray-700/50 dark:bg-black/30">
+                                <p class="text-gray-300">Tidak ada anime yang dijadwalkan untuk hari {{ selected_day }}.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="bg-black/30 backdrop-blur-md rounded-lg p-6 text-center border border-gray-700/50 dark:bg-black/30">
+                        <p class="text-gray-300">Tidak ada anime yang dijadwalkan untuk hari {{ selected_day }}.</p>
+                    </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <!-- Tampilkan jadwal untuk semua hari -->
+            {% for day, anime_list in jadwal_data.items %}
+                <div class="mb-10">
+                    <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-gray-700/50 bg-black/30 backdrop-blur-md p-3 rounded-t-lg dark:bg-black/30 dark:border-gray-700/50">{{ day }}</h2>
+                    
+                    {% if anime_list %}
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                            {% for anime in anime_list %}
+                                <div class="anime-card dynamic-border group relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 dark:shadow-lg dark:hover:shadow-xl">
+                                    {% if anime.anime_slug %}
+                                        <a href="{% url 'streamapp:detail_anime' anime.anime_slug %}" class="block">
+                                    {% else %}
+                                        <div class="block">
+                                    {% endif %}
+                                            <!-- Card Background with Blur Effect -->
+                                            <div class="absolute inset-0 bg-black/20 backdrop-blur-md rounded-xl z-0 dark:bg-black/20"></div>
+                                            
+                                            <!-- Image Container -->
+                                            <div class="relative pb-[140%] overflow-hidden z-10">
+                                                <!-- Image with Gradient Overlay -->
+                                                <div class="absolute inset-0 w-full h-full">
+                                                    <img src="{{ anime.cover_url }}" alt="{{ anime.title }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                                                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent dark:from-black/80 dark:via-black/20"></div>
+                                                </div>
+                                                
+                                                <!-- Play Button (Visible on Hover) -->
+                                                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+                                                    <div class="w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center dark:bg-primary/80">
+                                                        <i class="fas fa-play text-white"></i>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Type Badge -->
+                                                <div class="absolute top-2 right-2 bg-primary/80 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-md z-20 dark:bg-primary/80">
+                                                    {{ anime.type }}
+                                                </div>
+                                                
+                                                <!-- Score Badge -->
+                                                {% if anime.score %}
+                                                    <div class="absolute bottom-2 right-2 bg-yellow-500/80 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-md flex items-center z-20 dark:bg-yellow-500/80">
+                                                        <i class="fas fa-star mr-1"></i>
+                                                        {{ anime.score }}
+                                                    </div>
+                                                {% endif %}
+                                                
+                                                <!-- Content Overlay at Bottom -->
+                                                <div class="absolute bottom-0 left-0 right-0 p-4 z-20">
+                                                    <h3 class="title text-sm font-semibold text-white mb-2 line-clamp-2">{{ anime.title }}</h3>
+                                                    
+                                                    <!-- Genres -->
+                                                    <div class="flex flex-wrap gap-1 mb-2">
+                                                        {% for genre in anime.genres|slice:":2" %}
+                                                            <span class="text-xs bg-primary/40 backdrop-blur-sm text-white px-2 py-0.5 rounded-md dark:bg-primary/40">{{ genre }}</span>
+                                                        {% endfor %}
+                                                        {% if anime.genres|length > 2 %}
+                                                            <span class="text-xs bg-black/40 backdrop-blur-sm text-white px-2 py-0.5 rounded-md dark:bg-black/40">+{{ anime.genres|length|add:"-2" }}</span>
+                                                        {% endif %}
+                                                    </div>
+                                                    
+                                                    <div class="text-xs text-gray-300 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-md inline-flex items-center dark:bg-black/40 dark:text-gray-300">
+                                                        <i class="far fa-clock mr-1"></i> {{ anime.release_time }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    {% if anime.anime_slug %}
+                                        </a>
+                                    {% else %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% empty %}
+                                <div class="col-span-full bg-black/30 backdrop-blur-md rounded-lg p-6 text-center border border-gray-700/50 dark:bg-black/30">
+                                    <p class="text-gray-300">Tidak ada anime yang dijadwalkan untuk hari {{ day }}.</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="bg-black/30 backdrop-blur-md rounded-lg p-6 text-center border border-gray-700/50 dark:bg-black/30">
+                            <p class="text-gray-300">Tidak ada anime yang dijadwalkan untuk hari {{ day }}.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

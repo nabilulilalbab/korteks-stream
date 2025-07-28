@@ -1,0 +1,464 @@
+{% extends 'streamapp/base.html' %}
+
+{% block title %}Koleksi Saya - KortekStream{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Breadcrumb -->
+    <nav class="flex mb-6" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3 bg-black/30 backdrop-blur-md px-4 py-2 rounded-lg border border-gray-700/50 dark:bg-black/30">
+            <li class="inline-flex items-center">
+                <a href="{% url 'streamapp:index' %}" class="inline-flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-dark dark:hover:text-darkPrimary-light">
+                    <i class="fas fa-home mr-2"></i>
+                    Beranda
+                </a>
+            </li>
+            <li aria-current="page">
+                <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                    <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Koleksi Saya</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
+    
+    <!-- Tabs -->
+    <div class="mb-8">
+        <div class="border-b border-gray-200 dark:border-gray-700">
+            <ul class="flex flex-wrap -mb-px" id="collection-tabs" role="tablist">
+                <li class="mr-2" role="presentation">
+                    <button class="inline-block py-4 px-4 text-sm font-medium text-center border-b-2 border-primary dark:border-darkPrimary text-primary dark:text-darkPrimary rounded-t-lg active" 
+                            id="watchlist-tab" 
+                            data-tabs-target="#watchlist" 
+                            type="button" 
+                            role="tab" 
+                            aria-controls="watchlist" 
+                            aria-selected="true">
+                        <i class="fas fa-bookmark mr-2"></i>Watchlist
+                    </button>
+                </li>
+                <li class="mr-2" role="presentation">
+                    <button class="inline-block py-4 px-4 text-sm font-medium text-center border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 rounded-t-lg" 
+                            id="favorites-tab" 
+                            data-tabs-target="#favorites" 
+                            type="button" 
+                            role="tab" 
+                            aria-controls="favorites" 
+                            aria-selected="false">
+                        <i class="fas fa-heart mr-2"></i>Favorit
+                    </button>
+                </li>
+                <li role="presentation">
+                    <button class="inline-block py-4 px-4 text-sm font-medium text-center border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 dark:hover:text-gray-300 rounded-t-lg" 
+                            id="history-tab" 
+                            data-tabs-target="#history" 
+                            type="button" 
+                            role="tab" 
+                            aria-controls="history" 
+                            aria-selected="false">
+                        <i class="fas fa-history mr-2"></i>Riwayat Tontonan
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Tab Content -->
+    <div id="collection-content">
+        <!-- Watchlist Tab -->
+        <div class="block" id="watchlist" role="tabpanel" aria-labelledby="watchlist-tab">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Watchlist Saya</h2>
+                <button id="clear-watchlist" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors dark:bg-red-600 dark:hover:bg-red-700">
+                    <i class="fas fa-trash-alt mr-2"></i>Hapus Semua
+                </button>
+            </div>
+            
+            <div id="watchlist-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <!-- Watchlist items will be loaded here by JavaScript -->
+                <div class="text-center py-12 col-span-full text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-spinner fa-spin text-3xl mb-4"></i>
+                    <p>Memuat watchlist...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Favorites Tab -->
+        <div class="hidden" id="favorites" role="tabpanel" aria-labelledby="favorites-tab">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Anime Favorit</h2>
+                <button id="clear-favorites" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors dark:bg-red-600 dark:hover:bg-red-700">
+                    <i class="fas fa-trash-alt mr-2"></i>Hapus Semua
+                </button>
+            </div>
+            
+            <div id="favorites-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <!-- Favorites items will be loaded here by JavaScript -->
+                <div class="text-center py-12 col-span-full text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-spinner fa-spin text-3xl mb-4"></i>
+                    <p>Memuat favorit...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- History Tab -->
+        <div class="hidden" id="history" role="tabpanel" aria-labelledby="history-tab">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Riwayat Tontonan</h2>
+                <button id="clear-history" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors dark:bg-red-600 dark:hover:bg-red-700">
+                    <i class="fas fa-trash-alt mr-2"></i>Hapus Semua
+                </button>
+            </div>
+            
+            <div id="history-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <!-- History items will be loaded here by JavaScript -->
+                <div class="text-center py-12 col-span-full text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-spinner fa-spin text-3xl mb-4"></i>
+                    <p>Memuat riwayat tontonan...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab functionality
+        const tabButtons = document.querySelectorAll('[data-tabs-target]');
+        const tabContents = document.querySelectorAll('[role="tabpanel"]');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Hide all tab contents
+                tabContents.forEach(content => {
+                    content.classList.add('hidden');
+                    content.classList.remove('block');
+                });
+                
+                // Remove active state from all buttons
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('border-primary', 'dark:border-darkPrimary', 'text-primary', 'dark:text-darkPrimary');
+                    btn.classList.add('border-transparent');
+                    btn.setAttribute('aria-selected', 'false');
+                });
+                
+                // Show the selected tab content
+                const targetId = button.getAttribute('data-tabs-target').substring(1);
+                const targetContent = document.getElementById(targetId);
+                targetContent.classList.remove('hidden');
+                targetContent.classList.add('block');
+                
+                // Set active state to clicked button
+                button.classList.remove('border-transparent');
+                button.classList.add('border-primary', 'dark:border-darkPrimary', 'text-primary', 'dark:text-darkPrimary');
+                button.setAttribute('aria-selected', 'true');
+            });
+        });
+        
+        // Load data from localStorage
+        loadWatchlist();
+        loadFavorites();
+        loadHistory();
+        
+        // Add event listeners for clear buttons
+        document.getElementById('clear-watchlist').addEventListener('click', clearWatchlist);
+        document.getElementById('clear-favorites').addEventListener('click', clearFavorites);
+        document.getElementById('clear-history').addEventListener('click', clearHistory);
+    });
+    
+    // Watchlist Functions
+    function getWatchlist() {
+        try {
+            const watchlist = localStorage.getItem('kortekstream_watchlist');
+            return watchlist ? JSON.parse(watchlist) : [];
+        } catch (error) {
+            console.error('Error getting watchlist:', error);
+            return [];
+        }
+    }
+    
+    function loadWatchlist() {
+        const container = document.getElementById('watchlist-container');
+        const watchlist = getWatchlist();
+        
+        if (watchlist.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-12 col-span-full">
+                    <i class="fas fa-bookmark text-gray-300 dark:text-gray-600 text-5xl mb-4"></i>
+                    <p class="text-gray-500 dark:text-gray-400">Watchlist Anda kosong</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">Tambahkan anime ke watchlist dengan mengklik tombol "Tambah ke Watchlist" di halaman detail anime</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Sort by added date (newest first)
+        watchlist.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
+        
+        let html = '';
+        watchlist.forEach(item => {
+            html += `
+                <div class="anime-card dynamic-border bg-white dark:bg-darkSecondary rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700">
+                    <a href="/detail_anime/${item.slug}" class="block">
+                        <div class="relative pb-[140%] overflow-hidden">
+                            <img src="${item.cover}" alt="${item.title}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 hover:scale-105">
+                            
+                            <div class="absolute top-2 right-2 bg-primary dark:bg-darkPrimary text-white text-xs font-bold px-2 py-1 rounded-md">
+                                Watchlist
+                            </div>
+                            
+                            <button onclick="event.preventDefault(); removeFromWatchlistAndUpdate('${item.slug}')" class="absolute bottom-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors dark:bg-red-600 dark:hover:bg-red-700">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="p-4">
+                            <h3 class="title text-sm font-semibold text-gray-800 dark:text-white mb-2 line-clamp-2 h-10">${item.title}</h3>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                Ditambahkan: ${formatDate(item.addedAt)}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    function removeFromWatchlistAndUpdate(slug) {
+        let watchlist = getWatchlist();
+        watchlist = watchlist.filter(item => item.slug !== slug);
+        localStorage.setItem('kortekstream_watchlist', JSON.stringify(watchlist));
+        
+        // Reload the watchlist
+        loadWatchlist();
+        showNotification('Dihapus dari watchlist');
+    }
+    
+    function clearWatchlist() {
+        if (confirm('Apakah Anda yakin ingin menghapus semua item dari watchlist?')) {
+            localStorage.removeItem('kortekstream_watchlist');
+            loadWatchlist();
+            showNotification('Watchlist telah dihapus');
+        }
+    }
+    
+    // Favorites Functions
+    function getFavorites() {
+        try {
+            const favorites = localStorage.getItem('kortekstream_favorites');
+            return favorites ? JSON.parse(favorites) : [];
+        } catch (error) {
+            console.error('Error getting favorites:', error);
+            return [];
+        }
+    }
+    
+    function loadFavorites() {
+        const container = document.getElementById('favorites-container');
+        const favorites = getFavorites();
+        
+        if (favorites.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-12 col-span-full">
+                    <i class="fas fa-heart text-gray-300 dark:text-gray-600 text-5xl mb-4"></i>
+                    <p class="text-gray-500 dark:text-gray-400">Daftar favorit Anda kosong</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">Tambahkan anime ke favorit dengan mengklik tombol "Favorit" di halaman detail anime</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Sort by added date (newest first)
+        favorites.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
+        
+        let html = '';
+        favorites.forEach(item => {
+            html += `
+                <div class="anime-card dynamic-border bg-white dark:bg-darkSecondary rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700">
+                    <a href="/detail_anime/${item.slug}" class="block">
+                        <div class="relative pb-[140%] overflow-hidden">
+                            <img src="${item.cover}" alt="${item.title}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 hover:scale-105">
+                            
+                            <div class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">
+                                <i class="fas fa-heart mr-1"></i> Favorit
+                            </div>
+                            
+                            <button onclick="event.preventDefault(); removeFromFavoritesAndUpdate('${item.slug}')" class="absolute bottom-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors dark:bg-red-600 dark:hover:bg-red-700">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="p-4">
+                            <h3 class="title text-sm font-semibold text-gray-800 dark:text-white mb-2 line-clamp-2 h-10">${item.title}</h3>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                                Ditambahkan: ${formatDate(item.addedAt)}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    function removeFromFavoritesAndUpdate(slug) {
+        let favorites = getFavorites();
+        favorites = favorites.filter(item => item.slug !== slug);
+        localStorage.setItem('kortekstream_favorites', JSON.stringify(favorites));
+        
+        // Reload the favorites
+        loadFavorites();
+        showNotification('Dihapus dari favorit');
+    }
+    
+    function clearFavorites() {
+        if (confirm('Apakah Anda yakin ingin menghapus semua item dari favorit?')) {
+            localStorage.removeItem('kortekstream_favorites');
+            loadFavorites();
+            showNotification('Daftar favorit telah dihapus');
+        }
+    }
+    
+    // History Functions
+    function getWatchHistory() {
+        try {
+            const history = localStorage.getItem('kortekstream_history');
+            return history ? JSON.parse(history) : [];
+        } catch (error) {
+            console.error('Error getting watch history:', error);
+            return [];
+        }
+    }
+    
+    function loadHistory() {
+        const container = document.getElementById('history-container');
+        const history = getWatchHistory();
+        
+        if (history.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-12 col-span-full">
+                    <i class="fas fa-history text-gray-300 dark:text-gray-600 text-5xl mb-4"></i>
+                    <p class="text-gray-500 dark:text-gray-400">Riwayat tontonan Anda kosong</p>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">Riwayat akan otomatis ditambahkan saat Anda menonton episode</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        history.forEach(item => {
+            html += `
+                <div class="anime-card dynamic-border bg-white dark:bg-darkSecondary rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700">
+                    <a href="/detail_episode_video/${item.episodeSlug}" class="block">
+                        <div class="relative pb-[140%] overflow-hidden">
+                            <img src="${item.cover}" alt="${item.title}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 hover:scale-105">
+                            
+                            <div class="absolute top-2 right-2 bg-gray-800 text-white text-xs font-bold px-2 py-1 rounded-md">
+                                <i class="fas fa-play mr-1"></i> Ditonton
+                            </div>
+                            
+                            <button onclick="event.preventDefault(); removeFromHistoryAndUpdate('${item.episodeSlug}')" class="absolute bottom-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors dark:bg-red-600 dark:hover:bg-red-700">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="p-4">
+                            <h3 class="title text-sm font-semibold text-gray-800 dark:text-white mb-2 line-clamp-2 h-10">${item.episodeTitle}</h3>
+                            <div class="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+                                <span>${formatDate(item.watchedAt)}</span>
+                                <a href="/detail_anime/${item.slug}" class="text-primary dark:text-darkPrimary hover:underline">
+                                    <i class="fas fa-info-circle mr-1"></i>Detail
+                                </a>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    function removeFromHistoryAndUpdate(episodeSlug) {
+        let history = getWatchHistory();
+        history = history.filter(item => item.episodeSlug !== episodeSlug);
+        localStorage.setItem('kortekstream_history', JSON.stringify(history));
+        
+        // Reload the history
+        loadHistory();
+        showNotification('Dihapus dari riwayat');
+    }
+    
+    function clearHistory() {
+        if (confirm('Apakah Anda yakin ingin menghapus semua riwayat tontonan?')) {
+            localStorage.removeItem('kortekstream_history');
+            loadHistory();
+            showNotification('Riwayat tontonan telah dihapus');
+        }
+    }
+    
+    // Helper Functions
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('id-ID', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+    
+    // Notification Function
+    function showNotification(message) {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in-up dark:bg-black/70 dark:border dark:border-gray-700/50';
+        notification.textContent = message;
+        
+        // Add to DOM
+        document.body.appendChild(notification);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.classList.add('animate-fade-out');
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 500);
+        }, 3000);
+    }
+</script>
+
+<style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+    
+    .animate-fade-in-up {
+        animation: fadeInUp 0.3s ease-out forwards;
+    }
+    
+    .animate-fade-out {
+        animation: fadeOut 0.5s ease-out forwards;
+    }
+</style>
+{% endblock %}
