@@ -223,6 +223,16 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Peringatan untuk video error -->
+                <div class="mt-2 p-3 light-bg backdrop-blur-sm rounded-lg light-border flex items-center">
+                    <div class="text-yellow-400 mr-2">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <p class="text-sm light-text">
+                        <span class="font-medium">Video error?</span> Coba ganti server lain. Jika masih error, refresh halaman dan pilih server berbeda.
+                    </p>
+                </div>
             {% endif %}
         </div>
         
@@ -275,7 +285,7 @@
         <!-- Other Episodes -->
         {% if episode.other_episodes %}
             <div class="light-bg backdrop-blur-md rounded-xl shadow-lg p-6 mb-8 light-border">
-                <h2 class="text-xl font-bold light-text mb-4 pb-2 border-b light-border">Episode Lainnya</h2>
+                <h2 class="text-xl font-bold light-text mb-4 pb-2 border-b ">Episode Lainnya</h2>
                 
                 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                     {% for ep in episode.other_episodes %}
@@ -1094,24 +1104,47 @@
             
             // Pilih server default berdasarkan prioritas
             let defaultServerIndex = 0;
+            let premiumServerIndex = 0;
+            let premium720pIndex = 0;
+            let foundPremium720p = false;
             
-            // Cari server Nakama
+            // Cari server Premium 720p sebagai prioritas utama
             for (let i = 0; i < serverSelect.options.length; i++) {
                 const option = serverSelect.options[i];
                 const serverType = option.getAttribute('data-server-type');
+                const serverText = option.textContent.trim().toLowerCase();
                 
-                if (serverType === 'nakama') {
-                    defaultServerIndex = i;
+                // Cari Premium 720p
+                if (serverType === 'premium' && serverText.includes('720p')) {
+                    premium720pIndex = i;
+                    foundPremium720p = true;
                     break;
-                } else if (serverType === 'pucuk' && defaultServerIndex === 0) {
-                    defaultServerIndex = i;
-                } else if (serverType === 'blogspot' && defaultServerIndex === 0) {
-                    defaultServerIndex = i;
-                } else if (serverType === 'premium' && defaultServerIndex === 0) {
-                    defaultServerIndex = i;
-                } else if (serverType === 'mega' && defaultServerIndex === 0) {
-                    defaultServerIndex = i;
                 }
+                
+                // Simpan indeks server Premium pertama sebagai fallback
+                if (serverType === 'premium' && premiumServerIndex === 0) {
+                    premiumServerIndex = i;
+                }
+                
+                // Simpan indeks server lain sesuai prioritas jika belum ada yang ditemukan
+                if (defaultServerIndex === 0) {
+                    if (serverType === 'nakama') {
+                        defaultServerIndex = i;
+                    } else if (serverType === 'pucuk') {
+                        defaultServerIndex = i;
+                    } else if (serverType === 'blogspot') {
+                        defaultServerIndex = i;
+                    } else if (serverType === 'mega') {
+                        defaultServerIndex = i;
+                    }
+                }
+            }
+            
+            // Tentukan server yang akan dipilih
+            if (foundPremium720p) {
+                defaultServerIndex = premium720pIndex;
+            } else if (premiumServerIndex > 0) {
+                defaultServerIndex = premiumServerIndex;
             }
             
             // Pilih server default jika ada

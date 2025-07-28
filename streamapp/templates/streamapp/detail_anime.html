@@ -124,7 +124,7 @@
     {% if anime.episode_list %}
         <ul class="divide-y divide-gray-200 dark:divide-gray-700 max-h-[400px] overflow-y-auto pr-1">
             {% for episode in anime.episode_list %}
-                <li class="group rounded-lg transition-all duration-200 hover:bg-black/10 dark:hover:bg-white/10">
+                <li class="group  transition-all duration-200 hover:bg-black/10 dark:hover:bg-white/10">
                     {% if episode.url %}
                         {% with episode_slug=episode.url|cut:"https://samehadaku.now/"|cut:"/" %}
                             <a href="{% url 'streamapp:detail_episode_video' episode_slug %}" class="flex justify-between items-center px-2 py-2 sm:py-3">
