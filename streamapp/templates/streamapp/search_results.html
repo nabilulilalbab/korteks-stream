@@ -6,7 +6,7 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Breadcrumb -->
     <nav class="flex mb-6" aria-label="Breadcrumb">
-        <ol class="inline-flex items-center space-x-1 md:space-x-3 bg-black/30 backdrop-blur-md px-4 py-2 rounded-lg border border-gray-700/50 dark:bg-black/30">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3 bg-black/30 backdrop-blur-md px-4 py-2 rounded-lg border border-gray-700/50">
             <li class="inline-flex items-center">
                 <a href="{% url 'streamapp:index' %}" class="inline-flex items-center text-sm font-medium text-white hover:text-primary transition-colors">
                     <i class="fas fa-home mr-2"></i>
@@ -23,7 +23,7 @@
     </nav>
 
     <!-- Search Results Header -->
-    <div class="mb-8 bg-gradient-to-r from-primary/80 to-black/60 backdrop-blur-md p-6 rounded-xl border border-gray-700/50 dark:from-primary/80 dark:to-black/60">
+    <div class="mb-8 bg-gradient-to-r from-primary/80 to-black/60 backdrop-blur-md p-6 rounded-xl border border-gray-700/50">
         <h1 class="text-3xl font-bold text-white mb-2">Hasil Pencarian: "{{ query }}"</h1>
         {% if result_count %}
             <p class="text-gray-300">Ditemukan {{ result_count }} hasil untuk pencarian Anda.</p>
@@ -33,7 +33,7 @@
     </div>
 
     {% if error %}
-        <div class="bg-black/30 backdrop-blur-md border border-red-500/50 text-red-300 px-4 py-3 rounded-xl mb-8 dark:bg-black/30 dark:border-red-500/50 dark:text-red-300">
+        <div class="bg-black/30 backdrop-blur-md border border-red-500/50 text-red-300 px-4 py-3 rounded-xl mb-8">
             <p>{{ error }}</p>
         </div>
     {% endif %}
@@ -42,41 +42,41 @@
     {% if results %}
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {% for anime in results %}
-                <div class="anime-card dynamic-border group relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 dark:shadow-lg dark:hover:shadow-xl">
+                <div class="anime-card dynamic-border group relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
                     <a href="{% url 'streamapp:detail_anime' anime.anime_slug %}" class="block">
                         <!-- Card Background with Blur Effect -->
-                        <div class="absolute inset-0 bg-black/20 backdrop-blur-md rounded-xl z-0 dark:bg-black/20"></div>
+                        <div class="absolute inset-0 bg-black/20 backdrop-blur-md rounded-xl z-0"></div>
                         
                         <!-- Image Container -->
                         <div class="relative pb-[140%] overflow-hidden z-10">
                             <!-- Image with Gradient Overlay -->
                             <div class="absolute inset-0 w-full h-full">
                                 <img src="{{ anime.url_cover }}" alt="{{ anime.judul }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent dark:from-black/80 dark:via-black/20"></div>
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                             </div>
                             
                             <!-- Play Button (Visible on Hover) -->
                             <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
-                                <div class="w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center dark:bg-primary/80">
+                                <div class="w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center">
                                     <i class="fas fa-play text-white"></i>
                                 </div>
                             </div>
                             
                             <!-- Rating Badge -->
                             {% if anime.skor != "N/A" %}
-                                <div class="absolute top-2 right-2 bg-yellow-500/80 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-md flex items-center z-20 dark:bg-yellow-500/80">
+                                <div class="absolute top-2 right-2 bg-yellow-500/80 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-md flex items-center z-20">
                                     <i class="fas fa-star mr-1"></i>
                                     {{ anime.skor }}
                                 </div>
                             {% endif %}
                             
                             <!-- Type Badge -->
-                            <div class="absolute bottom-2 left-2 bg-primary/80 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-md z-20 dark:bg-primary/80">
+                            <div class="absolute bottom-2 left-2 bg-primary/80 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-md z-20">
                                 {{ anime.tipe }}
                             </div>
                             
                             <!-- Status Badge -->
-                            <div class="absolute bottom-2 right-2 {% if anime.status == 'Ongoing' %}bg-green-500/80 dark:bg-green-500/80{% else %}bg-blue-500/80 dark:bg-blue-500/80{% endif %} backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-md z-20">
+                            <div class="absolute bottom-2 right-2 {% if anime.status == 'Ongoing' %}bg-green-500/80{% else %}bg-blue-500/80{% endif %} backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-md z-20">
                                 {{ anime.status }}
                             </div>
                             
@@ -87,16 +87,16 @@
                                 <!-- Genres -->
                                 <div class="flex flex-wrap gap-1 mt-2">
                                     {% for genre in anime.genre|slice:":3" %}
-                                        <span class="text-xs bg-primary/40 backdrop-blur-sm text-white px-2 py-0.5 rounded-md dark:bg-primary/40">{{ genre }}</span>
+                                        <span class="text-xs bg-primary/40 backdrop-blur-sm text-white px-2 py-0.5 rounded-md">{{ genre }}</span>
                                     {% endfor %}
                                     {% if anime.genre|length > 3 %}
-                                        <span class="text-xs bg-black/40 backdrop-blur-sm text-white px-2 py-0.5 rounded-md dark:bg-black/40">+{{ anime.genre|length|add:"-3" }}</span>
+                                        <span class="text-xs bg-black/40 backdrop-blur-sm text-white px-2 py-0.5 rounded-md">+{{ anime.genre|length|add:"-3" }}</span>
                                     {% endif %}
                                 </div>
                                 
                                 <!-- Penonton -->
                                 {% if anime.penonton != "N/A" %}
-                                    <div class="mt-2 text-xs text-gray-300 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-md inline-flex items-center dark:bg-black/40 dark:text-gray-300">
+                                    <div class="mt-2 text-xs text-gray-300 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-md inline-flex items-center">
                                         <i class="fas fa-eye mr-1"></i> {{ anime.penonton }}
                                     </div>
                                 {% endif %}
@@ -108,7 +108,7 @@
         </div>
     {% else %}
         {% if not error %}
-            <div class="bg-black/30 backdrop-blur-md rounded-xl p-8 text-center border border-gray-700/50 dark:bg-black/30">
+            <div class="bg-black/30 backdrop-blur-md rounded-xl p-8 text-center border border-gray-700/50">
                 <i class="fas fa-search text-5xl text-gray-500 mb-4"></i>
                 <h3 class="text-xl font-semibold text-white mb-2">Tidak ada hasil yang ditemukan</h3>
                 <p class="text-gray-300 mb-4">Coba gunakan kata kunci yang berbeda atau lebih umum.</p>
@@ -116,10 +116,10 @@
                 <div class="mt-6">
                     <h4 class="text-lg font-semibold text-white mb-3">Saran Pencarian:</h4>
                     <div class="flex flex-wrap justify-center gap-2">
-                        <a href="{% url 'streamapp:search' %}?q=one piece" class="px-4 py-2 bg-primary/80 backdrop-blur-sm text-white rounded-full hover:bg-primary transition-colors border border-primary/30 dark:bg-primary/80 dark:hover:bg-primary dark:border-primary/30">One Piece</a>
-                        <a href="{% url 'streamapp:search' %}?q=naruto" class="px-4 py-2 bg-primary/80 backdrop-blur-sm text-white rounded-full hover:bg-primary transition-colors border border-primary/30 dark:bg-primary/80 dark:hover:bg-primary dark:border-primary/30">Naruto</a>
-                        <a href="{% url 'streamapp:search' %}?q=attack on titan" class="px-4 py-2 bg-primary/80 backdrop-blur-sm text-white rounded-full hover:bg-primary transition-colors border border-primary/30 dark:bg-primary/80 dark:hover:bg-primary dark:border-primary/30">Attack on Titan</a>
-                        <a href="{% url 'streamapp:search' %}?q=demon slayer" class="px-4 py-2 bg-primary/80 backdrop-blur-sm text-white rounded-full hover:bg-primary transition-colors border border-primary/30 dark:bg-primary/80 dark:hover:bg-primary dark:border-primary/30">Demon Slayer</a>
+                        <a href="{% url 'streamapp:search' %}?q=one piece" class="px-4 py-2 bg-primary/80 backdrop-blur-sm text-white rounded-full hover:bg-primary transition-colors border border-primary/30">One Piece</a>
+                        <a href="{% url 'streamapp:search' %}?q=naruto" class="px-4 py-2 bg-primary/80 backdrop-blur-sm text-white rounded-full hover:bg-primary transition-colors border border-primary/30">Naruto</a>
+                        <a href="{% url 'streamapp:search' %}?q=attack on titan" class="px-4 py-2 bg-primary/80 backdrop-blur-sm text-white rounded-full hover:bg-primary transition-colors border border-primary/30">Attack on Titan</a>
+                        <a href="{% url 'streamapp:search' %}?q=demon slayer" class="px-4 py-2 bg-primary/80 backdrop-blur-sm text-white rounded-full hover:bg-primary transition-colors border border-primary/30">Demon Slayer</a>
                     </div>
                 </div>
             </div>

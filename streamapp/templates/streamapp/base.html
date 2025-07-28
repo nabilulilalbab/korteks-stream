@@ -53,9 +53,9 @@
                     backdropBlur: {
                         xs: '2px',
                         sm: '4px',
-                        md: '16px',
-                        lg: '24px',
-                        xl: '40px',
+                        md: '8px',
+                        lg: '12px',
+                        xl: '16px',
                     },
                     animation: {
                         'gradient-x': 'gradient-x 3s ease infinite',
@@ -146,434 +146,35 @@
             background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.7) 100%);
         }
         
-        /* Dark mode hero overlay */
-        .dark .hero-overlay {
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(69,10,10,0.5) 50%, rgba(0,0,0,0.7) 100%);
-        }
-        
-        /* Hero Background dengan Blur Effect untuk dark mode */
-        .dark .hero-bg {
-            filter: blur(4px);
-            transform: scale(1.1);
-        }
-        
-        /* Image Overlay Gradients untuk dark mode */
-        .dark .img-overlay {
-            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 60%);
-        }
-        
         /* Animasi untuk tema */
         .theme-transition {
             transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
         
-        /* Background dan styling untuk light dan dark mode */
+        /* Background untuk light dan dark mode */
         body {
             background: #ffffff;
             color: #000000;
             background-attachment: fixed;
         }
         
-        /* Dark mode styling - Background Halaman Utama */
         .dark body {
             background: linear-gradient(to bottom right, #000000, #450a0a, #000000);
             background-attachment: fixed;
-            background-size: 200% 200%;
             color: #ffffff;
-            min-height: 100vh;
         }
         
-        /* Glass effect for dark mode - Enhanced Glass Morphism */
-        .dark .glass-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(16px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.125);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        /* Styling untuk notifikasi */
+        .notification {
+            position: fixed;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            max-height: screen;
+            width: full;
+            flex-direction: column-reverse;
+            padding: 1rem;
         }
-        
-        /* Custom Red Variants for dark mode */
-        .dark .bg-red-950-custom {
-            background-color: #450a0a;
-        }
-        
-        .dark .bg-red-900-custom {
-            background-color: #7f1d1d;
-        }
-        
-        /* Card styling for dark mode - Card Background Utama */
-        .dark .bg-white\/10 {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-        
-        .dark .hover\:bg-white\/20:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-        
-        /* Scrollbar styling for dark mode */
-        .dark .scrollbar-thin::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .dark .scrollbar-thin::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        
-        .dark .scrollbar-thin::-webkit-scrollbar-thumb {
-            background: rgba(239, 68, 68, 0.5);
-            border-radius: 3px;
-        }
-        
-        /* Hero Background dengan Blur Effect untuk dark mode */
-        .dark .hero-bg {
-            filter: blur(4px);
-            transform: scale(1.1);
-        }
-        
-        .dark .hero-overlay {
-            background: linear-gradient(to bottom,
-                rgba(0,0,0,0.7) 0%,
-                rgba(69,10,10,0.5) 50%,
-                rgba(0,0,0,0.7) 100%);
-        }
-        
-        /* Image Overlay Gradients untuk dark mode */
-        .dark .img-overlay {
-            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 60%);
-        }
-        
-        /* Header/Navbar Background untuk dark mode */
-                .dark .bg-black\/20 {
-                    background-color: rgba(0,0,0,0.2);
-                    backdrop-filter: blur(16px);
-                    border-bottom: 1px solid rgba(255,255,255,0.1);
-                }
-                
-                /* Header/Navbar Background untuk light mode */
-                :not(.dark) .bg-black\/20 {
-                    background-color: rgba(255,255,255,0.9);
-                    backdrop-filter: blur(16px);
-                    border-bottom: 1px solid rgba(218,165,32,0.3);
-                }
-        
-        /* Hero Background Animation */
-        @keyframes hero-slide {
-            0% { transform: scale(1.1) translateX(0); }
-            100% { transform: scale(1.1) translateX(-10px); }
-        }
-        
-        .dark .hero-bg-animate {
-            animation: hero-slide 20s ease-in-out infinite alternate;
-        }
-        
-        /* Fallback backgrounds */
-        .dark .bg-fallback {
-            background: linear-gradient(135deg, #000000 0%, #450a0a 50%, #000000 100%);
-        }
-        
-        /* CSS CUSTOM UNTUK EFEK KHUSUS DARK MODE */
-        
-        /* Enhanced Glass Effect untuk dark mode */
-        .dark .glass-effect {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(16px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.125);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        }
-        
-        /* Mobile Adaptations untuk dark mode */
-        @media (max-width: 640px) {
-            .dark body {
-                background: linear-gradient(to bottom, #000000, #450a0a, #000000);
-            }
-            
-            .dark .glass-card,
-            .dark .bg-white\/10 {
-                backdrop-filter: blur(8px);
-            }
-        }
-        
-        /* Fallback untuk browser lama */
-        @supports not (backdrop-filter: blur(16px)) {
-            .dark .backdrop-blur-md {
-                background: rgba(0, 0, 0, 0.8) !important;
-            }
-        }
-        
-        /* Scroll Bar Styling untuk dark mode */
-        .dark .scrollbar-thin::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .dark .scrollbar-thin::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        
-        .dark .scrollbar-thin::-webkit-scrollbar-thumb {
-            background: rgba(239, 68, 68, 0.5);
-            border-radius: 3px;
-        }
-        
-        /* Border styling untuk light mode */
-                :not(.dark) .border-white\/10 {
-                    border-color: rgba(218, 165, 32, 0.3) !important; /* goldenrod dengan opacity */
-                }
-                
-                :not(.dark) .border-white\/20 {
-                    border-color: rgba(218, 165, 32, 0.5) !important; /* goldenrod dengan opacity */
-                }
-                
-                :not(.dark) .border-gray-700\/50,
-                :not(.dark) .border-gray-700\/30 {
-                    border-color: rgba(218, 165, 32, 0.3) !important; /* goldenrod dengan opacity */
-                }
-                
-                /* Border styling untuk dark mode */
-                .dark .border-white\/10 {
-                    border-color: rgba(255, 255, 255, 0.1) !important;
-                }
-                
-                .dark .border-white\/20 {
-                    border-color: rgba(255, 255, 255, 0.2) !important;
-                }
-                
-                .dark .border-gray-700\/50,
-                .dark .border-gray-700\/30 {
-                    border-color: rgba(255, 255, 255, 0.1) !important;
-                }
-        
-        /* Background styling untuk card di light mode */
-                :not(.dark) .bg-white\/10 {
-                    background-color: rgba(255, 255, 255, 0.9) !important;
-                    border: 1px solid rgba(218, 165, 32, 0.5) !important;
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-                }
-                
-                :not(.dark) .bg-black\/80,
-                :not(.dark) .bg-black\/30,
-                :not(.dark) .bg-black\/20,
-                :not(.dark) .bg-black\/40,
-                :not(.dark) .bg-black\/50,
-                :not(.dark) .bg-black\/60,
-                :not(.dark) .bg-black\/70 {
-                    background-color: rgba(255, 255, 255, 0.9) !important;
-                    border: 1px solid rgba(218, 165, 32, 0.5) !important;
-                }
-        
-        /* Text color untuk light mode */
-                :not(.dark) .text-white {
-                    color: #000000 !important;
-                }
-                
-                :not(.dark) .text-gray-400,
-                :not(.dark) .text-gray-300,
-                :not(.dark) .text-gray-500,
-                :not(.dark) .text-gray-600,
-                :not(.dark) .text-gray-700 {
-                    color: #555555 !important;
-                }
-                
-                :not(.dark) .text-red-400,
-                :not(.dark) .text-red-300,
-                :not(.dark) .text-red-500,
-                :not(.dark) .text-red-600,
-                :not(.dark) .text-red-700 {
-                    color: #daa520 !important; /* goldenrod */
-                }
-        
-        /* Hover effects untuk light mode */
-                :not(.dark) .hover\:bg-white\/20:hover {
-                    background-color: rgba(218, 165, 32, 0.2) !important;
-                }
-                
-                :not(.dark) .hover\:bg-black\/60:hover,
-                :not(.dark) .hover\:bg-black\/70:hover,
-                :not(.dark) .hover\:bg-black\/50:hover,
-                :not(.dark) .hover\:bg-black\/40:hover {
-                    background-color: rgba(218, 165, 32, 0.2) !important;
-                }
-                
-                :not(.dark) .hover\:text-red-300:hover,
-                :not(.dark) .hover\:text-red-400:hover,
-                :not(.dark) .hover\:text-red-500:hover,
-                :not(.dark) .hover\:text-primary:hover,
-                :not(.dark) .hover\:text-white:hover {
-                    color: #b8860b !important; /* darkgoldenrod */
-                }
-        
-        /* Hover effects untuk dark mode */
-                .dark .hover\:bg-white\/20:hover {
-                    background-color: rgba(255, 255, 255, 0.2) !important;
-                }
-                
-                .dark .hover\:bg-black\/60:hover,
-                .dark .hover\:bg-black\/70:hover,
-                .dark .hover\:bg-black\/50:hover,
-                .dark .hover\:bg-black\/40:hover {
-                    background-color: rgba(0, 0, 0, 0.6) !important;
-                }
-                
-                .dark .hover\:text-red-300:hover,
-                .dark .hover\:text-red-400:hover,
-                .dark .hover\:text-red-500:hover,
-                .dark .hover\:text-primary:hover,
-                .dark .hover\:text-white:hover {
-                    color: #fca5a5 !important; /* red-300 */
-                }
-        
-        /* Button styling untuk light mode */
-                :not(.dark) .bg-red-600,
-                :not(.dark) .bg-red-500,
-                :not(.dark) .bg-red-700,
-                :not(.dark) .bg-primary,
-                :not(.dark) .bg-primary\/80 {
-                    background-color: #daa520 !important; /* goldenrod */
-                    color: white !important;
-                }
-                
-                :not(.dark) .hover\:bg-red-700:hover,
-                :not(.dark) .hover\:bg-red-600:hover,
-                :not(.dark) .hover\:bg-red-500:hover,
-                :not(.dark) .hover\:bg-primary:hover,
-                :not(.dark) .hover\:bg-primary\/80:hover {
-                    background-color: #b8860b !important; /* darkgoldenrod */
-                }
-                
-                :not(.dark) .bg-red-600\/20,
-                :not(.dark) .bg-red-600\/30,
-                :not(.dark) .bg-red-600\/40,
-                :not(.dark) .bg-red-500\/20,
-                :not(.dark) .bg-red-500\/30,
-                :not(.dark) .bg-red-500\/40,
-                :not(.dark) .bg-primary\/20,
-                :not(.dark) .bg-primary\/30,
-                :not(.dark) .bg-primary\/40 {
-                    background-color: rgba(218, 165, 32, 0.2) !important;
-                }
-        
-        /* Button styling untuk dark mode */
-                .dark .bg-red-600,
-                .dark .bg-red-500,
-                .dark .bg-red-700,
-                .dark .bg-primary,
-                .dark .bg-primary\/80 {
-                    background-color: #dc2626 !important; /* red-600 */
-                    color: white !important;
-                }
-                
-                .dark .hover\:bg-red-700:hover,
-                .dark .hover\:bg-red-600:hover,
-                .dark .hover\:bg-red-500:hover,
-                .dark .hover\:bg-primary:hover,
-                .dark .hover\:bg-primary\/80:hover {
-                    background-color: #b91c1c !important; /* red-700 */
-                }
-                
-                .dark .bg-red-600\/20,
-                .dark .bg-red-600\/30,
-                .dark .bg-red-600\/40,
-                .dark .bg-red-500\/20,
-                .dark .bg-red-500\/30,
-                .dark .bg-red-500\/40,
-                .dark .bg-primary\/20,
-                .dark .bg-primary\/30,
-                .dark .bg-primary\/40 {
-                    background-color: rgba(220, 38, 38, 0.2) !important;
-                }
-        
-        /* Badge styling untuk light mode */
-                :not(.dark) .bg-yellow-500\/80,
-                :not(.dark) .bg-yellow-500,
-                :not(.dark) .bg-yellow-400,
-                :not(.dark) .bg-gray-900\/80,
-                :not(.dark) .bg-gray-900 {
-                    background-color: rgba(218, 165, 32, 0.8) !important;
-                    color: white !important;
-                }
-        
-        /* Navbar dan footer styling untuk light mode */
-                :not(.dark) .bg-black\/20,
-                :not(.dark) .bg-black\/30,
-                :not(.dark) .bg-black\/40,
-                :not(.dark) .bg-black\/50,
-                :not(.dark) .bg-black\/60,
-                :not(.dark) .bg-black\/70,
-                :not(.dark) .bg-black\/80 {
-                    background-color: rgba(255, 255, 255, 0.9) !important;
-                    border-color: rgba(218, 165, 32, 0.3) !important;
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-                }
-        
-        /* Footer styling untuk dark mode */
-                .dark .bg-black\/30,
-                .dark .bg-black\/20,
-                .dark .bg-black\/40,
-                .dark .bg-black\/50,
-                .dark .bg-black\/60,
-                .dark .bg-black\/70,
-                .dark .bg-black\/80 {
-                    background-color: rgba(0,0,0,0.3);
-                    backdrop-filter: blur(16px);
-                    border-color: rgba(255,255,255,0.1);
-                }
-        
-        /* Jadwal rilis styling untuk light mode */
-                :not(.dark) .space-y-3 > a:hover,
-                :not(.dark) .space-y-3 > div:hover {
-                    background-color: rgba(218, 165, 32, 0.2) !important;
-                }
-                
-                /* Icon styling untuk light mode */
-                :not(.dark) .text-yellow-400,
-                :not(.dark) .text-yellow-500,
-                :not(.dark) .text-yellow-300 {
-                    color: #daa520 !important; /* goldenrod */
-                }
-        
-        /* Placeholder styling untuk light mode */
-                :not(.dark) ::placeholder {
-                    color: rgba(0, 0, 0, 0.5) !important;
-                }
-                
-                :not(.dark) .placeholder-gray-400::placeholder {
-                    color: rgba(0, 0, 0, 0.5) !important;
-                }
-                
-                /* Placeholder styling untuk dark mode */
-                .dark ::placeholder {
-                    color: rgba(255, 255, 255, 0.5) !important;
-                }
-                
-                .dark .placeholder-gray-400::placeholder {
-                    color: rgba(255, 255, 255, 0.5) !important;
-                }
-                
-                /* Focus styling untuk light mode */
-                :not(.dark) .focus\:ring-red-500:focus,
-                :not(.dark) .focus\:ring-primary:focus {
-                    --tw-ring-color: rgba(218, 165, 32, 0.5) !important;
-                }
-                
-                /* Focus styling untuk dark mode */
-                .dark .focus\:ring-red-500:focus,
-                .dark .focus\:ring-primary:focus {
-                    --tw-ring-color: rgba(220, 38, 38, 0.5) !important;
-                }
-                
-                /* Styling untuk notifikasi */
-                .notification {
-                    position: fixed;
-                    top: 0;
-                    z-index: 100;
-                    display: flex;
-                    max-height: screen;
-                    width: full;
-                    flex-direction: column-reverse;
-                    padding: 1rem;
-                }
         
         @media (min-width: 640px) {
             .notification {
@@ -594,7 +195,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body class="theme-transition min-h-screen flex flex-col dark:text-white text-black">
-    <!-- Navbar - Header/Navbar Background -->
+    <!-- Navbar -->
     <nav class="sticky top-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/10">
         <div class="container mx-auto px-4 py-4">
             <div class="flex justify-between items-center">

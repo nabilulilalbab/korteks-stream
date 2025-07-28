@@ -6,7 +6,7 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Breadcrumb -->
     <nav class="flex mb-6" aria-label="Breadcrumb">
-        <ol class="inline-flex items-center space-x-1 md:space-x-3 bg-black/30 backdrop-blur-md px-4 py-2 rounded-lg border border-gray-700/50 dark:bg-black/30">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3 bg-black/30 backdrop-blur-md px-4 py-2 rounded-lg border border-gray-700/50">
             <li class="inline-flex items-center">
                 <a href="{% url 'streamapp:index' %}" class="inline-flex items-center text-sm font-medium text-white hover:text-primary transition-colors">
                     <i class="fas fa-home mr-2"></i>
@@ -23,18 +23,18 @@
     </nav>
 
     <!-- Page Header -->
-    <div class="mb-8 bg-gradient-to-r from-primary/80 to-black/60 backdrop-blur-md p-6 rounded-xl border border-gray-700/50 dark:from-primary/80 dark:to-black/60">
+    <div class="mb-8 bg-gradient-to-r from-primary/80 to-black/60 backdrop-blur-md p-6 rounded-xl border border-gray-700/50">
         <h1 class="text-3xl font-bold text-white">Semua Movie Anime</h1>
         <p class="text-gray-300 mt-2">Koleksi lengkap movie anime terbaik</p>
     </div>
 
     {% if error %}
-        <div class="bg-red-100 dark:bg-red-900 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg mb-8 dark:bg-red-900 dark:border-red-800 dark:text-red-300">
+        <div class="bg-red-100 dark:bg-red-900 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg mb-8">
             <p>{{ error }}</p>
         </div>
     {% else %}
         <!-- Info Panel -->
-        <div class="bg-black/30 backdrop-blur-md rounded-lg border border-gray-700/50 p-4 mb-8 dark:bg-black/30">
+        <div class="bg-black/30 backdrop-blur-md rounded-lg border border-gray-700/50 p-4 mb-8">
             {% if movie_data.total_pages %}
                 <p class="text-gray-300">Total halaman: <span class="text-white font-semibold">{{ movie_data.total_pages }}</span> | Menampilkan halaman <span class="text-white font-semibold">{{ current_page }}</span></p>
                 <p class="text-gray-300">Total movie yang ditampilkan: <span class="text-white font-semibold">{{ movie_data.movie_count }}</span></p>
@@ -48,28 +48,28 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {% if movie_data.data %}
                 {% for movie in movie_data.data %}
-                    <div class="anime-card dynamic-border group relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 dark:shadow-lg dark:hover:shadow-xl">
+                    <div class="anime-card dynamic-border group relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
                         <a href="{% url 'streamapp:detail_anime' movie.anime_slug %}" class="block">
                             <!-- Card Background with Blur Effect -->
-                            <div class="absolute inset-0 bg-black/20 backdrop-blur-md rounded-xl z-0 dark:bg-black/20"></div>
+                            <div class="absolute inset-0 bg-black/20 backdrop-blur-md rounded-xl z-0"></div>
                             
                             <!-- Image Container -->
                             <div class="relative pb-[140%] overflow-hidden z-10">
                                 <!-- Image with Gradient Overlay -->
                                 <div class="absolute inset-0 w-full h-full">
                                     <img src="{{ movie.cover }}" alt="{{ movie.judul }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent dark:from-black/80 dark:via-black/20"></div>
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                                 </div>
                                 
                                 <!-- Play Button (Visible on Hover) -->
                                 <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
-                                    <div class="w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center dark:bg-primary/80">
+                                    <div class="w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center">
                                         <i class="fas fa-play text-white"></i>
                                     </div>
                                 </div>
                                 
                                 {% if movie.status %}
-                                    <div class="absolute top-2 right-2 bg-primary/80 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-md z-20 dark:bg-primary/80">
+                                    <div class="absolute top-2 right-2 bg-primary/80 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-md z-20">
                                         {{ movie.status }}
                                     </div>
                                 {% endif %}
@@ -80,13 +80,13 @@
                                     
                                     <div class="flex space-x-3 text-xs mb-2">
                                         {% if movie.skor %}
-                                            <div class="text-yellow-300 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-md dark:bg-black/40 dark:text-yellow-300">
+                                            <div class="text-yellow-300 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-md">
                                                 <i class="fas fa-star mr-1"></i> {{ movie.skor }}
                                             </div>
                                         {% endif %}
                                         
                                         {% if movie.views %}
-                                            <div class="text-gray-300 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-md dark:bg-black/40 dark:text-gray-300">
+                                            <div class="text-gray-300 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-md">
                                                 <i class="fas fa-eye mr-1"></i> {{ movie.views }}
                                             </div>
                                         {% endif %}
@@ -95,10 +95,10 @@
                                     {% if movie.genres %}
                                         <div class="flex flex-wrap gap-1 mt-2">
                                             {% for genre in movie.genres|slice:":2" %}
-                                                <span class="bg-primary/40 backdrop-blur-sm text-white text-xs px-2 py-0.5 rounded-md dark:bg-primary/40">{{ genre }}</span>
+                                                <span class="bg-primary/40 backdrop-blur-sm text-white text-xs px-2 py-0.5 rounded-md">{{ genre }}</span>
                                             {% endfor %}
                                             {% if movie.genres|length > 2 %}
-                                                <span class="bg-black/40 backdrop-blur-sm text-white text-xs px-2 py-0.5 rounded-md dark:bg-black/40">+{{ movie.genres|length|add:"-2" }}</span>
+                                                <span class="bg-black/40 backdrop-blur-sm text-white text-xs px-2 py-0.5 rounded-md">+{{ movie.genres|length|add:"-2" }}</span>
                                             {% endif %}
                                         </div>
                                     {% endif %}
@@ -108,7 +108,7 @@
                     </div>
                 {% endfor %}
             {% else %}
-                <div class="col-span-full bg-gray-100 dark:bg-gray-800 rounded-lg p-6 text-center dark:bg-gray-800">
+                <div class="col-span-full bg-gray-100 dark:bg-gray-800 rounded-lg p-6 text-center">
                     <p class="text-gray-600 dark:text-gray-400">Tidak ada movie yang ditemukan.</p>
                 </div>
             {% endif %}
@@ -117,11 +117,11 @@
         <!-- Pagination -->
         <div class="flex justify-center mt-10 space-x-2">
             {% if current_page > 1 %}
-                <a href="?page={{ current_page|add:'-1' }}" class="px-4 py-2 bg-black/30 backdrop-blur-md border border-gray-700/50 text-white rounded-lg hover:bg-primary/80 transition-colors dark:bg-black/30 dark:hover:bg-primary/80">
+                <a href="?page={{ current_page|add:'-1' }}" class="px-4 py-2 bg-black/30 backdrop-blur-md border border-gray-700/50 text-white rounded-lg hover:bg-primary/80 transition-colors">
                     <i class="fas fa-chevron-left mr-1"></i> Sebelumnya
                 </a>
             {% else %}
-                <span class="px-4 py-2 bg-black/20 backdrop-blur-md border border-gray-700/30 text-gray-400 rounded-lg cursor-not-allowed dark:bg-black/20 dark:text-gray-400">
+                <span class="px-4 py-2 bg-black/20 backdrop-blur-md border border-gray-700/30 text-gray-400 rounded-lg cursor-not-allowed">
                     <i class="fas fa-chevron-left mr-1"></i> Sebelumnya
                 </span>
             {% endif %}
@@ -129,11 +129,11 @@
             {% if movie_data.total_pages %}
                 {% for i in movie_data.total_pages|ljust:"5"|slice:":5" %}
                     {% if forloop.counter == current_page %}
-                        <span class="px-4 py-2 bg-primary/80 backdrop-blur-md border border-primary/30 text-white rounded-lg dark:bg-primary/80 dark:border-primary/30">
+                        <span class="px-4 py-2 bg-primary/80 backdrop-blur-md border border-primary/30 text-white rounded-lg">
                             {{ forloop.counter }}
                         </span>
                     {% else %}
-                        <a href="?page={{ forloop.counter }}" class="px-4 py-2 bg-black/30 backdrop-blur-md border border-gray-700/50 text-white rounded-lg hover:bg-primary/60 transition-colors dark:bg-black/30 dark:hover:bg-primary/60">
+                        <a href="?page={{ forloop.counter }}" class="px-4 py-2 bg-black/30 backdrop-blur-md border border-gray-700/50 text-white rounded-lg hover:bg-primary/60 transition-colors">
                             {{ forloop.counter }}
                         </a>
                     {% endif %}
@@ -141,11 +141,11 @@
             {% else %}
                 {% for i in "12345" %}
                     {% if current_page == forloop.counter %}
-                        <span class="px-4 py-2 bg-primary/80 backdrop-blur-md border border-primary/30 text-white rounded-lg dark:bg-primary/80 dark:border-primary/30">
+                        <span class="px-4 py-2 bg-primary/80 backdrop-blur-md border border-primary/30 text-white rounded-lg">
                             {{ forloop.counter }}
                         </span>
                     {% else %}
-                        <a href="?page={{ forloop.counter }}" class="px-4 py-2 bg-black/30 backdrop-blur-md border border-gray-700/50 text-white rounded-lg hover:bg-primary/60 transition-colors dark:bg-black/30 dark:hover:bg-primary/60">
+                        <a href="?page={{ forloop.counter }}" class="px-4 py-2 bg-black/30 backdrop-blur-md border border-gray-700/50 text-white rounded-lg hover:bg-primary/60 transition-colors">
                             {{ forloop.counter }}
                         </a>
                     {% endif %}
@@ -153,11 +153,11 @@
             {% endif %}
             
             {% if current_page < movie_data.total_pages %}
-                <a href="?page={{ current_page|add:'1' }}" class="px-4 py-2 bg-black/30 backdrop-blur-md border border-gray-700/50 text-white rounded-lg hover:bg-primary/80 transition-colors dark:bg-black/30 dark:hover:bg-primary/80">
+                <a href="?page={{ current_page|add:'1' }}" class="px-4 py-2 bg-black/30 backdrop-blur-md border border-gray-700/50 text-white rounded-lg hover:bg-primary/80 transition-colors">
                     Selanjutnya <i class="fas fa-chevron-right ml-1"></i>
                 </a>
             {% else %}
-                <span class="px-4 py-2 bg-black/20 backdrop-blur-md border border-gray-700/30 text-gray-400 rounded-lg cursor-not-allowed dark:bg-black/20 dark:text-gray-400">
+                <span class="px-4 py-2 bg-black/20 backdrop-blur-md border border-gray-700/30 text-gray-400 rounded-lg cursor-not-allowed">
                     Selanjutnya <i class="fas fa-chevron-right ml-1"></i>
                 </span>
             {% endif %}
