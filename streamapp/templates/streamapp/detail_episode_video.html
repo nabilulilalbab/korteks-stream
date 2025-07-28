@@ -300,14 +300,32 @@
 <script>
     // Tambahkan episode ke watch history saat halaman dimuat
     document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM Content Loaded - Memulai proses penambahan riwayat tontonan");
+        
+        // Periksa apakah localStorage tersedia
+        if (!isLocalStorageAvailable()) {
+            console.error("localStorage tidak tersedia, tidak dapat menyimpan riwayat tontonan");
+            showNotification('Tidak dapat menyimpan riwayat tontonan');
+            return;
+        }
+        
+        // Dapatkan informasi episode dari URL jika tidak tersedia dari template
+        const episodeSlug = '{{ request.path|cut:"/detail_episode_video/" }}';
+        const episodeTitle = '{{ episode.title|escapejs }}' || 'Episode Tidak Diketahui';
+        
         // Dapatkan informasi anime dan episode
         {% if episode.navigation.all_episodes_url %}
+            console.log("episode.navigation.all_episodes_url tersedia");
             {% with anime_slug=episode.navigation.all_episodes_url|cut:"https://samehadaku.now/anime/"|cut:"/" %}
                 const animeSlug = '{{ anime_slug }}';
                 const animeTitle = '{{ episode.title|escapejs }}'.split(' Episode')[0];
-                const episodeSlug = '{{ request.path|cut:"/detail_episode_video/" }}';
-                const episodeTitle = '{{ episode.title|escapejs }}';
                 const animeCover = '{{ episode.other_episodes.0.thumbnail_url|default:""|escapejs }}';
+                
+                console.log("Data untuk history:", {
+                    animeSlug, animeTitle, episodeSlug, episodeTitle, animeCover
+                });
+                
+                console.log("localStorage tersedia, menambahkan ke riwayat tontonan");
                 
                 // Tambahkan ke watch history
                 addToWatchHistory(null, animeTitle, animeSlug, episodeSlug, episodeTitle, animeCover);
@@ -319,7 +337,127 @@
                 // Tampilkan notifikasi
                 showNotification('Ditambahkan ke riwayat tontonan');
             {% endwith %}
+        {% else %}
+            console.log("episode.navigation.all_episodes_url TIDAK tersedia, mencoba alternatif");
+            
+            // Alternatif jika all_episodes_url tidak tersedia
+            // Ekstrak informasi dari judul episode atau URL
+            let animeTitle = '';
+            let animeSlug = '';
+            let animeCover = '';
+            
+            // Coba ekstrak judul anime dari judul episode
+            if (episodeTitle && episodeTitle.includes('Episode')) {
+                animeTitle = episodeTitle.split('Episode')[0].trim();
+            } else {
+                animeTitle = 'Anime Tidak Diketahui';
+            }
+            
+            // Coba dapatkan slug dari URL jika memungkinkan
+            if (episodeSlug.includes('/')) {
+                animeSlug = episodeSlug.split('/')[0];
+            } else {
+                animeSlug = episodeSlug;
+            }
+            
+            // Coba dapatkan cover dari thumbnail episode jika ada
+            {% if episode.other_episodes.0.thumbnail_url %}
+                animeCover = '{{ episode.other_episodes.0.thumbnail_url|escapejs }}';
+            {% else %}
+                animeCover = '';
+            {% endif %}
+            
+            console.log("Data alternatif untuk history:", {
+                animeSlug, animeTitle, episodeSlug, episodeTitle, animeCover
+            });
+            
+            // Tambahkan ke watch history dengan data alternatif
+            addToWatchHistory(null, animeTitle, animeSlug, episodeSlug, episodeTitle, animeCover);
+            
+            // Tampilkan notifikasi
+            showNotification('Ditambahkan ke riwayat tontonan');
         {% endif %}
+        
+        // Tambahkan event listener untuk video player
+        setTimeout(function() {
+            const videoElements = document.querySelectorAll('video');
+            if (videoElements.length > 0) {
+                console.log("Video player ditemukan, menambahkan event listener");
+                
+                videoElements.forEach(function(video) {
+                    // Tambahkan event listener untuk play
+                    video.addEventListener('play', function() {
+                        console.log("Video mulai diputar, memastikan riwayat tontonan ditambahkan");
+                        // Tambahkan ke riwayat tontonan lagi untuk memastikan
+                        const currentEpisodeSlug = '{{ request.path|cut:"/detail_episode_video/" }}';
+                        const currentEpisodeTitle = '{{ episode.title|escapejs }}' || 'Episode Tidak Diketahui';
+                        
+                        {% if episode.navigation.all_episodes_url %}
+                            {% with anime_slug=episode.navigation.all_episodes_url|cut:"https://samehadaku.now/anime/"|cut:"/" %}
+                                const currentAnimeSlug = '{{ anime_slug }}';
+                                const currentAnimeTitle = '{{ episode.title|escapejs }}'.split(' Episode')[0];
+                                const currentAnimeCover = '{{ episode.other_episodes.0.thumbnail_url|default:""|escapejs }}';
+                                
+                                addToWatchHistory(null, currentAnimeTitle, currentAnimeSlug, currentEpisodeSlug, currentEpisodeTitle, currentAnimeCover);
+                            {% endwith %}
+                        {% endif %}
+                    });
+                    
+                    // Tambahkan event listener untuk timeupdate (setiap 30 detik)
+                    let lastUpdateTime = 0;
+                    video.addEventListener('timeupdate', function() {
+                        const currentTime = Math.floor(video.currentTime);
+                        // Update riwayat setiap 30 detik
+                        if (currentTime - lastUpdateTime >= 30) {
+                            console.log(`Video telah diputar selama ${currentTime} detik, memperbarui riwayat tontonan`);
+                            lastUpdateTime = currentTime;
+                            
+                            // Tambahkan ke riwayat tontonan lagi untuk memastikan
+                            const currentEpisodeSlug = '{{ request.path|cut:"/detail_episode_video/" }}';
+                            const currentEpisodeTitle = '{{ episode.title|escapejs }}' || 'Episode Tidak Diketahui';
+                            
+                            {% if episode.navigation.all_episodes_url %}
+                                {% with anime_slug=episode.navigation.all_episodes_url|cut:"https://samehadaku.now/anime/"|cut:"/" %}
+                                    const currentAnimeSlug = '{{ anime_slug }}';
+                                    const currentAnimeTitle = '{{ episode.title|escapejs }}'.split(' Episode')[0];
+                                    const currentAnimeCover = '{{ episode.other_episodes.0.thumbnail_url|default:""|escapejs }}';
+                                    
+                                    addToWatchHistory(null, currentAnimeTitle, currentAnimeSlug, currentEpisodeSlug, currentEpisodeTitle, currentAnimeCover);
+                                {% endwith %}
+                            {% endif %}
+                        }
+                    });
+                });
+            } else {
+                console.log("Video player tidak ditemukan, mungkin menggunakan iframe");
+                
+                // Coba dapatkan iframe
+                const iframeElements = document.querySelectorAll('iframe');
+                if (iframeElements.length > 0) {
+                    console.log("Iframe player ditemukan");
+                    
+                    // Tambahkan event listener untuk iframe load
+                    iframeElements.forEach(function(iframe) {
+                        iframe.addEventListener('load', function() {
+                            console.log("Iframe dimuat, memastikan riwayat tontonan ditambahkan");
+                            // Tambahkan ke riwayat tontonan lagi untuk memastikan
+                            const currentEpisodeSlug = '{{ request.path|cut:"/detail_episode_video/" }}';
+                            const currentEpisodeTitle = '{{ episode.title|escapejs }}' || 'Episode Tidak Diketahui';
+                            
+                            {% if episode.navigation.all_episodes_url %}
+                                {% with anime_slug=episode.navigation.all_episodes_url|cut:"https://samehadaku.now/anime/"|cut:"/" %}
+                                    const currentAnimeSlug = '{{ anime_slug }}';
+                                    const currentAnimeTitle = '{{ episode.title|escapejs }}'.split(' Episode')[0];
+                                    const currentAnimeCover = '{{ episode.other_episodes.0.thumbnail_url|default:""|escapejs }}';
+                                    
+                                    addToWatchHistory(null, currentAnimeTitle, currentAnimeSlug, currentEpisodeSlug, currentEpisodeTitle, currentAnimeCover);
+                                {% endwith %}
+                            {% endif %}
+                        });
+                    });
+                }
+            }
+        }, 2000); // Tunggu 2 detik untuk memastikan player sudah dimuat
     });
     
     // Watchlist Functions
@@ -499,9 +637,22 @@
     }
     
     // Watch History Functions
+    function isLocalStorageAvailable() {
+        try {
+            const test = '__test__';
+            localStorage.setItem(test, test);
+            localStorage.removeItem(test);
+            return true;
+        } catch(e) {
+            console.error("localStorage tidak tersedia:", e);
+            return false;
+        }
+    }
+    
     function getWatchHistory() {
         try {
             const history = localStorage.getItem('kortekstream_history');
+            console.log("Riwayat tontonan dari localStorage:", history ? "Ditemukan" : "Kosong");
             return history ? JSON.parse(history) : [];
         } catch (error) {
             console.error('Error getting watch history:', error);
@@ -510,23 +661,30 @@
     }
     
     function addToWatchHistory(animeId, title, slug, episodeSlug, episodeTitle, cover) {
+        console.log("addToWatchHistory dipanggil dengan:", {
+            animeId, title, slug, episodeSlug, episodeTitle, cover
+        });
+        
         try {
             let history = getWatchHistory();
+            console.log("Jumlah riwayat tontonan sebelum ditambahkan:", history.length);
             
             // Limit history to 100 items
             if (history.length >= 100) {
+                console.log("Riwayat tontonan melebihi 100 item, memotong ke 99 item");
                 history = history.slice(0, 99);
             }
             
             // Check if this episode is already in history
             const existingIndex = history.findIndex(item => item.episodeSlug === episodeSlug);
             if (existingIndex !== -1) {
+                console.log("Episode sudah ada di riwayat tontonan, menghapus entry lama");
                 // Remove the existing entry
                 history.splice(existingIndex, 1);
             }
             
             // Add to beginning of array (most recent first)
-            history.unshift({
+            const newHistoryItem = {
                 id: animeId || Date.now(),
                 title: title,
                 slug: slug,
@@ -534,11 +692,27 @@
                 episodeTitle: episodeTitle,
                 cover: cover,
                 watchedAt: new Date().toISOString()
-            });
+            };
             
+            console.log("Menambahkan item baru ke riwayat tontonan:", newHistoryItem);
+            history.unshift(newHistoryItem);
+            
+            console.log("Menyimpan riwayat tontonan ke localStorage");
             localStorage.setItem('kortekstream_history', JSON.stringify(history));
+            console.log("Riwayat tontonan berhasil disimpan ke localStorage");
+            
+            // Verifikasi penyimpanan
+            const savedHistory = localStorage.getItem('kortekstream_history');
+            if (savedHistory) {
+                const parsedHistory = JSON.parse(savedHistory);
+                console.log("Verifikasi: Jumlah riwayat tontonan setelah disimpan:", parsedHistory.length);
+                console.log("Verifikasi: Item pertama di riwayat tontonan:", parsedHistory[0]);
+            } else {
+                console.error("Verifikasi gagal: Riwayat tontonan tidak ditemukan di localStorage setelah disimpan");
+            }
         } catch (error) {
             console.error('Error adding to watch history:', error);
+            showNotification('Gagal menyimpan riwayat tontonan');
         }
     }
     
@@ -776,6 +950,19 @@
         }
     }
     
+    // Fungsi untuk mengubah URL Pixeldrain dari /u/ ke /api/file/
+    function convertPixeldrainUrl(url) {
+        if (url && url.includes('pixeldrain.com/u/')) {
+            // Ekstrak ID file dari URL
+            const fileId = url.split('pixeldrain.com/u/')[1];
+            // Buat URL baru dengan format /api/file/
+            const newUrl = `https://pixeldrain.com/api/file/${fileId}`;
+            console.log("URL Pixeldrain diubah:", url, "->", newUrl);
+            return newUrl;
+        }
+        return url;
+    }
+    
     // Fungsi utama untuk mengubah server
     function changeServer(button) {
         // Hapus kelas active dari semua tombol
@@ -789,8 +976,13 @@
         button.classList.add('bg-primary/60');
         
         // Dapatkan URL dan tipe server
-        const url = button.getAttribute('data-url');
+        let url = button.getAttribute('data-url');
         const serverType = button.getAttribute('data-server-type');
+        
+        // Konversi URL Pixeldrain jika diperlukan
+        if (url && url.includes('pixeldrain.com/u/')) {
+            url = convertPixeldrainUrl(url);
+        }
         
         // Tampilkan pesan loading
         const playerFrame = document.getElementById('player-frame');
@@ -812,6 +1004,8 @@
                 break;
                 
             case 'nakama':
+                // Nakama sering menggunakan Pixeldrain, pastikan URL sudah dikonversi
+                url = convertPixeldrainUrl(url);
                 handleNakamaServer(url);
                 break;
                 

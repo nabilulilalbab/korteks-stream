@@ -82,6 +82,15 @@ def scrape_episode_details(url):
                     streaming_url = future.result()
                     if streaming_url:
                         print(f"  -> Link ditemukan untuk server: {server_name}")
+                        
+                        # Konversi URL Pixeldrain dari /u/ ke /api/file/
+                        if "pixeldrain.com/u/" in streaming_url:
+                            # Ekstrak ID file dari URL
+                            file_id = streaming_url.split("pixeldrain.com/u/")[1]
+                            # Buat URL baru dengan format /api/file/
+                            streaming_url = f"https://pixeldrain.com/api/file/{file_id}"
+                            print(f"      Mengubah URL Pixeldrain ke: {streaming_url}")
+                        
                         streaming_servers.append({"server_name": server_name, "streaming_url": streaming_url})
         
         episode_details['streaming_servers'] = sorted(streaming_servers, key=lambda x: x['server_name'])
