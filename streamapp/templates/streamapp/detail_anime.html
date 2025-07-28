@@ -39,48 +39,52 @@
     <!-- Content -->
     <div class="relative z-10 flex flex-col md:flex-row backdrop-blur-md light-bg rounded-xl overflow-hidden light-border">
         <!-- Thumbnail -->
-        <div class="md:w-1/3 lg:w-1/4 relative">
-            <img src="{{ anime.thumbnail_url }}" alt="{{ anime.title }}" class="w-full h-auto object-cover">
-            <div class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black to-transparent"></div>
+        <div class="w-full md:w-1/3 lg:w-1/4 relative">
+            <div class="md:h-full">
+                <img src="{{ anime.thumbnail_url }}" alt="{{ anime.title }}" class="w-full h-auto md:h-full object-cover">
+                <div class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black to-transparent"></div>
+            </div>
         </div>
 
         <!-- Info -->
-        <div class="p-6 flex-1">
+        <div class="p-4 sm:p-6 flex-1">
             <div class="flex flex-col md:flex-row md:items-start md:justify-between">
                 <div>
-                    <h1 class="text-2xl md:text-3xl font-bold light-text mb-3">{{ anime.title }}</h1>
+                    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold light-text mb-2 sm:mb-3 break-words">{{ anime.title }}</h1>
 
-                    <div class="inline-block bg-yellow-500/80 backdrop-blur-sm text-white px-3 py-1 rounded-md font-bold mb-4 dark:bg-yellow-500/80">
+                    <div class="inline-block bg-yellow-500/80 backdrop-blur-sm text-white px-2 sm:px-3 py-1 rounded-md font-bold mb-3 sm:mb-4 dark:bg-yellow-500/80 text-sm sm:text-base">
                         <span><i class="fas fa-star mr-1"></i> {{ anime.rating.score }}</span>
                         <small>({{ anime.rating.users }})</small>
                     </div>
                 </div>
 
                 <!-- User Action Buttons -->
-                <div class="flex space-x-2 mb-4 md:mb-0">
-                    <button id="watchlist-btn" onclick="toggleWatchlist('{{ anime.title|escapejs }}', '{{ request.path|cut:'/detail_anime/'|escapejs }}', '{{ anime.thumbnail_url|escapejs }}')" class="flex items-center px-4 py-2 bg-primary/80 backdrop-blur-sm text-white rounded-lg hover:bg-primary transition-colors">
-                        <i id="watchlist-icon" class="fas fa-bookmark mr-2"></i>
-                        <span id="watchlist-text">Tambah ke Watchlist</span>
+                <div class="flex space-x-2 mb-3 md:mb-0">
+                    <button id="watchlist-btn" onclick="toggleWatchlist('{{ anime.title|escapejs }}', '{{ request.path|cut:'/detail_anime/'|escapejs }}', '{{ anime.thumbnail_url|escapejs }}')" class="flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-primary/80 backdrop-blur-sm text-white rounded-lg hover:bg-primary transition-colors text-sm sm:text-base">
+                        <i id="watchlist-icon" class="fas fa-bookmark mr-1 sm:mr-2"></i>
+                        <span id="watchlist-text" class="hidden xs:inline">Tambah ke Watchlist</span>
+                        <span class="xs:hidden">Watchlist</span>
                     </button>
 
-                    <button id="favorite-btn" onclick="toggleFavorite('{{ anime.title|escapejs }}', '{{ request.path|cut:'/detail_anime/'|escapejs }}', '{{ anime.thumbnail_url|escapejs }}')" class="flex items-center px-4 py-2 bg-primary/80 backdrop-blur-sm text-white rounded-lg hover:bg-primary transition-colors">
-                        <i id="favorite-icon" class="far fa-heart mr-2"></i>
+                    <button id="favorite-btn" onclick="toggleFavorite('{{ anime.title|escapejs }}', '{{ request.path|cut:'/detail_anime/'|escapejs }}', '{{ anime.thumbnail_url|escapejs }}')" class="flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-primary/80 backdrop-blur-sm text-white rounded-lg hover:bg-primary transition-colors text-sm sm:text-base">
+                        <i id="favorite-icon" class="far fa-heart mr-1 sm:mr-2"></i>
                         <span id="favorite-text">Favorit</span>
                     </button>
                 </div>
             </div>
 
             <!-- Genre Tags -->
-            <div class="flex flex-wrap gap-2 mb-4">
+            <div class="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
                 {% for genre in anime.genres %}
-                    <span class="bg-primary/80 text-white px-3 py-1 rounded-full text-sm hover:bg-primary transition-colors cursor-pointer">
+                    <span class="bg-primary/80 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm hover:bg-primary transition-colors cursor-pointer">
                         {{ genre }}
                     </span>
                 {% endfor %}
             </div>
 
-            <div class="text-gray-700 dark:text-gray-300 mb-4">
-                <p>{{ anime.synopsis }}</p>
+            <div class="text-gray-700 dark:text-gray-300 mb-3 sm:mb-4 text-sm sm:text-base">
+                <p class="line-clamp-4 md:line-clamp-none">{{ anime.synopsis }}</p>
+                <button id="read-more" class="text-primary hover:underline mt-1 md:hidden">Baca selengkapnya</button>
             </div>
         </div>
     </div>
@@ -88,14 +92,14 @@
 
         
 <!-- Detail Information -->
-<div class="light-bg backdrop-blur-md rounded-xl shadow-lg p-6 mb-8 light-border">
-    <h2 class="text-xl font-bold light-text mb-4 pb-2 border-b border-gray-300 dark:border-gray-700">Informasi Detail</h2>
+<div class="light-bg backdrop-blur-md rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 light-border">
+    <h2 class="text-lg sm:text-xl font-bold light-text mb-3 sm:mb-4 pb-2 border-b border-gray-300 dark:border-gray-700">Informasi Detail</h2>
     
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4 text-sm sm:text-base">
         {% for key, value in anime.details.items %}
-            <div class="py-2">
+            <div class="py-1.5 sm:py-2">
                 <span class="font-semibold text-gray-800 dark:text-gray-300">{{ key }}:</span>
-                <span class="text-gray-700 dark:text-gray-400 ml-2">{{ value }}</span>
+                <span class="text-gray-700 dark:text-gray-400 ml-1 sm:ml-2">{{ value }}</span>
             </div>
         {% endfor %}
     </div>
@@ -103,32 +107,42 @@
 
       
 <!-- Episode List -->
-<div class="light-bg backdrop-blur-md rounded-xl shadow-lg p-6 mb-8 light-border">
-    <h2 class="text-xl font-bold light-text mb-4 pb-2 border-b border-gray-300 dark:border-gray-700">Daftar Episode</h2>
+<div class="light-bg backdrop-blur-md rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 light-border">
+    <div class="flex items-center justify-between mb-3 sm:mb-4 pb-2 border-b border-gray-300 dark:border-gray-700">
+        <h2 class="text-lg sm:text-xl font-bold light-text">Daftar Episode</h2>
+        
+        <!-- Episode Filter/Sort (Optional) -->
+        <div class="flex items-center space-x-2">
+            <button id="episode-sort-toggle" class="text-xs sm:text-sm px-2 py-1 rounded-md bg-primary/20 dark:bg-white/10 hover:bg-primary/30 dark:hover:bg-white/20 transition-colors">
+                <i class="fas fa-sort-amount-down mr-1"></i>
+                <span class="hidden xs:inline">Terbaru</span>
+            </button>
+        </div>
+    </div>
 
     {% if anime.episode_list %}
-        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+        <ul class="divide-y divide-gray-200 dark:divide-gray-700 max-h-[400px] overflow-y-auto pr-1">
             {% for episode in anime.episode_list %}
-                <li class="group rounded-lg transition-all duration-200 px-2 hover:bg-black/10 dark:hover:bg-white/10">
+                <li class="group rounded-lg transition-all duration-200 hover:bg-black/10 dark:hover:bg-white/10">
                     {% if episode.url %}
                         {% with episode_slug=episode.url|cut:"https://samehadaku.now/"|cut:"/" %}
-                            <a href="{% url 'streamapp:detail_episode_video' episode_slug %}" class="flex justify-between items-center px-2 py-3">
-                                <div>
-                                    <div class="font-medium light-text group-hover:text-primary transition-colors">
+                            <a href="{% url 'streamapp:detail_episode_video' episode_slug %}" class="flex justify-between items-center px-2 py-2 sm:py-3">
+                                <div class="overflow-hidden">
+                                    <div class="font-medium light-text group-hover:text-primary transition-colors text-sm sm:text-base truncate">
                                         {{ episode.title }}
                                     </div>
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">Rilis: {{ episode.release_date }}</span>
+                                    <span class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Rilis: {{ episode.release_date }}</span>
                                 </div>
-                                <div class="text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div class="text-primary opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2">
                                     <i class="fas fa-play"></i>
                                 </div>
                             </a>
                         {% endwith %}
                     {% else %}
-                        <div class="flex justify-between items-center px-2 py-3">
-                            <div>
-                                <div class="font-medium light-text">{{ episode.title }}</div>
-                                <span class="text-sm text-gray-500 dark:text-gray-400">Rilis: {{ episode.release_date }}</span>
+                        <div class="flex justify-between items-center px-2 py-2 sm:py-3">
+                            <div class="overflow-hidden">
+                                <div class="font-medium light-text text-sm sm:text-base truncate">{{ episode.title }}</div>
+                                <span class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Rilis: {{ episode.release_date }}</span>
                             </div>
                         </div>
                     {% endif %}
@@ -136,7 +150,7 @@
             {% endfor %}
         </ul>
     {% else %}
-        <p class="text-gray-600 dark:text-gray-400">Belum ada episode yang tersedia.</p>
+        <p class="text-gray-600 dark:text-gray-400 text-sm sm:text-base">Belum ada episode yang tersedia.</p>
     {% endif %}
 </div>
 
@@ -144,12 +158,29 @@
         
         <!-- Recommendations -->
         {% if anime.recommendations %}
-            <div class="light-bg backdrop-blur-md rounded-xl shadow-lg p-6 mb-8 light-border">
-                <h2 class="text-xl font-bold light-text mb-4 pb-2 border-b ">Rekomendasi Anime Lainnya</h2>
+            <div class="light-bg backdrop-blur-md rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 light-border">
+                <div class="flex items-center justify-between mb-3 sm:mb-4 pb-2 border-b border-gray-300 dark:border-gray-700">
+                    <h2 class="text-lg sm:text-xl font-bold light-text">Rekomendasi Anime Lainnya</h2>
+                    
+                    <!-- Scroll Controls for Desktop -->
+                    <div class="hidden md:flex space-x-2">
+                        <button id="rec-scroll-left" class="p-1.5 rounded-full bg-primary/20 hover:bg-primary/40 dark:bg-white/10 dark:hover:bg-white/20 transition-colors">
+                            <i class="fas fa-chevron-left text-black dark:text-white text-xs"></i>
+                        </button>
+                        <button id="rec-scroll-right" class="p-1.5 rounded-full bg-primary/20 hover:bg-primary/40 dark:bg-white/10 dark:hover:bg-white/20 transition-colors">
+                            <i class="fas fa-chevron-right text-black dark:text-white text-xs"></i>
+                        </button>
+                    </div>
+                </div>
                 
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <!-- Swipe Instructions for Mobile -->
+                <div class="md:hidden text-center text-xs text-gray-500 dark:text-gray-400 mb-3">
+                    <i class="fas fa-hand-point-right mr-1"></i> Geser untuk melihat lebih banyak
+                </div>
+                
+                <div id="recommendations-carousel" class="flex overflow-x-auto pb-4 space-x-3 sm:space-x-4 scrollbar-hide scroll-smooth">
                     {% for rec in anime.recommendations %}
-                        <div class="anime-card dynamic-border group relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div class="anime-card dynamic-border group relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex-shrink-0 w-[160px] sm:w-[180px] md:w-[200px]">
                             <a href="{% url 'streamapp:detail_anime' rec.url|cut:'https://samehadaku.now/anime/'|cut:'/' %}" class="block">
                                 <!-- Card Background with Blur Effect -->
                                 <div class="absolute inset-0 bg-black/20 backdrop-blur-md rounded-xl z-0"></div>
@@ -164,20 +195,20 @@
                                     
                                     <!-- Play Button (Visible on Hover) -->
                                     <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
-                                        <div class="w-12 h-12 rounded-full bg-primary/80 flex items-center justify-center">
+                                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/80 flex items-center justify-center">
                                             <i class="fas fa-play text-white"></i>
                                         </div>
                                     </div>
                                     
                                     <!-- Content Overlay at Bottom -->
-                                    <div class="absolute bottom-0 left-0 right-0 p-4 z-20">
-                                        <h3 class="title text-sm font-semibold light-text mb-2 line-clamp-2">{{ rec.title }}</h3>
+                                    <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-4 z-20">
+                                        <h3 class="title text-xs sm:text-sm font-semibold light-text mb-1 sm:mb-2 line-clamp-2">{{ rec.title }}</h3>
                                         
                                         <div class="flex justify-between items-center text-xs">
-                                            <span class="text-yellow-300 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-md">
+                                            <span class="text-yellow-300 bg-black/40 backdrop-blur-sm px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-xs">
                                                 <i class="fas fa-star mr-1"></i> {{ rec.rating }}
                                             </span>
-                                            <span class="text-gray-300 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-md">{{ rec.episode }}</span>
+                                            <span class="text-gray-300 bg-black/40 backdrop-blur-sm px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md text-xs">{{ rec.episode }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -448,6 +479,104 @@
             }, 500);
         }, 3000);
     }
+    
+    // Read more functionality for synopsis on mobile
+    document.addEventListener('DOMContentLoaded', function() {
+        const readMoreBtn = document.getElementById('read-more');
+        if (readMoreBtn) {
+            const synopsis = readMoreBtn.previousElementSibling;
+            readMoreBtn.addEventListener('click', function() {
+                synopsis.classList.toggle('line-clamp-4');
+                readMoreBtn.textContent = synopsis.classList.contains('line-clamp-4') ? 'Baca selengkapnya' : 'Sembunyikan';
+            });
+        }
+        
+        // Horizontal scroll for recommendations
+        const scrollLeftBtn = document.getElementById('rec-scroll-left');
+        const scrollRightBtn = document.getElementById('rec-scroll-right');
+        const carousel = document.getElementById('recommendations-carousel');
+        
+        if (scrollLeftBtn && scrollRightBtn && carousel) {
+            // Scroll left button
+            scrollLeftBtn.addEventListener('click', function() {
+                carousel.scrollBy({
+                    left: -300,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Scroll right button
+            scrollRightBtn.addEventListener('click', function() {
+                carousel.scrollBy({
+                    left: 300,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Add touch swipe detection for mobile
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            carousel.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            }, false);
+            
+            carousel.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, false);
+            
+            function handleSwipe() {
+                const swipeDistance = touchStartX - touchEndX;
+                const cardWidth = 180; // Approximate card width
+                
+                if (Math.abs(swipeDistance) > 50) { // Minimum swipe distance
+                    carousel.scrollBy({
+                        left: swipeDistance > 0 ? cardWidth : -cardWidth,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        }
+        
+        // Episode sort toggle
+        const episodeSortToggle = document.getElementById('episode-sort-toggle');
+        const episodeList = document.querySelector('ul.divide-y');
+        
+        if (episodeSortToggle && episodeList) {
+            let isNewestFirst = true;
+            
+            episodeSortToggle.addEventListener('click', function() {
+                const episodes = Array.from(episodeList.children);
+                episodes.reverse();
+                
+                // Clear the list
+                while (episodeList.firstChild) {
+                    episodeList.removeChild(episodeList.firstChild);
+                }
+                
+                // Add the reversed episodes
+                episodes.forEach(episode => {
+                    episodeList.appendChild(episode);
+                });
+                
+                // Update the button text
+                isNewestFirst = !isNewestFirst;
+                const icon = episodeSortToggle.querySelector('i');
+                const text = episodeSortToggle.querySelector('span');
+                
+                if (isNewestFirst) {
+                    icon.classList.remove('fa-sort-amount-up');
+                    icon.classList.add('fa-sort-amount-down');
+                    if (text) text.textContent = 'Terbaru';
+                } else {
+                    icon.classList.remove('fa-sort-amount-down');
+                    icon.classList.add('fa-sort-amount-up');
+                    if (text) text.textContent = 'Terlama';
+                }
+            });
+        }
+    });
 </script>
 
 <style>

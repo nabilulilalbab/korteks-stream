@@ -225,12 +225,12 @@
 <body class="theme-transition min-h-screen flex flex-col dark:text-white text-black">
     <!-- Navbar -->
     <nav class="sticky top-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/10 dark:bg-black/20 dark:border-white/10">
-        <div class="container mx-auto px-4 py-4">
+        <div class="container mx-auto px-4 py-3 sm:py-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center">
                     <!-- Logo -->
                     <a href="{% url 'streamapp:index' %}" class="flex-shrink-0 flex items-center">
-                        <span class="text-2xl font-bold text-black dark:text-white">🎌 Kortek<span class="text-red-500">Stream</span></span>
+                        <span class="text-xl sm:text-2xl font-bold text-black dark:text-white">🎌 Kortek<span class="text-red-500">Stream</span></span>
                     </a>
                     
                     <!-- Desktop Navigation Links -->
@@ -242,51 +242,80 @@
                     </div>
                 </div>
                 
-                <div class="flex items-center space-x-4">
-                    <!-- Search Bar -->
-                    <div class="relative flex-1 max-w-md">
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <!-- Search Bar - Hidden on smallest screens, shown with icon -->
+                    <div class="hidden sm:block relative flex-1 max-w-md">
                         <form action="{% url 'streamapp:search' %}" method="GET" class="flex items-center">
                             <input type="text" name="q" placeholder="Cari anime..."
-                                class="w-full px-4 py-2 rounded-lg bg-white/80 dark:bg-white/10 backdrop-blur-md border border-primary/30 dark:border-white/20 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-red-500" required>
-                            <button type="submit" class="absolute right-0 top-0 mt-2 mr-3 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white">
+                                class="w-full px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-white/80 dark:bg-white/10 backdrop-blur-md border border-primary/30 dark:border-white/20 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-red-500 text-sm" required>
+                            <button type="submit" class="absolute right-0 top-0 mt-1.5 sm:mt-2 mr-3 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white">
                                 <i class="fas fa-search"></i>
                             </button>
                         </form>
                     </div>
                     
-                    <!-- Collection Links -->
-                    <a href="{% url 'streamapp:user_collection' %}?tab=watchlist" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
-                        <i class="fas fa-bookmark w-5 h-5"></i>
-                    </a>
+                    <!-- Search Icon for Mobile -->
+                    <button id="mobile-search-button" class="sm:hidden text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 rounded-full flex items-center justify-center transition-colors">
+                        <i class="fas fa-search w-4 h-4"></i>
+                    </button>
                     
-                    <a href="{% url 'streamapp:user_collection' %}?tab=favorites" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
-                        <i class="fas fa-heart w-5 h-5"></i>
-                    </a>
-                    
-                    <a href="{% url 'streamapp:user_collection' %}?tab=history" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
-                        <i class="fas fa-clock w-5 h-5"></i>
-                    </a>
+                    <!-- Collection Links - Hidden on smallest screens, shown in mobile menu -->
+                    <div class="hidden sm:flex space-x-1 sm:space-x-2">
+                        <a href="{% url 'streamapp:user_collection' %}?tab=watchlist" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-colors">
+                            <i class="fas fa-bookmark w-4 h-4 sm:w-5 sm:h-5"></i>
+                        </a>
+                        
+                        <a href="{% url 'streamapp:user_collection' %}?tab=favorites" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-colors">
+                            <i class="fas fa-heart w-4 h-4 sm:w-5 sm:h-5"></i>
+                        </a>
+                        
+                        <a href="{% url 'streamapp:user_collection' %}?tab=history" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-colors">
+                            <i class="fas fa-clock w-4 h-4 sm:w-5 sm:h-5"></i>
+                        </a>
+                    </div>
                     
                     <!-- Theme Toggle -->
-                    <button id="theme-toggle" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
-                        <i class="fas fa-sun dark:hidden w-5 h-5"></i>
-                        <i class="fas fa-moon hidden dark:inline w-5 h-5"></i>
+                    <button id="theme-toggle" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-colors">
+                        <i class="fas fa-sun dark:hidden w-4 h-4 sm:w-5 sm:h-5"></i>
+                        <i class="fas fa-moon hidden dark:inline w-4 h-4 sm:w-5 sm:h-5"></i>
                     </button>
                     
                     <!-- Mobile menu button -->
-                    <button id="mobile-menu-button" class="md:hidden text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
-                        <i class="fas fa-bars w-5 h-5"></i>
+                    <button id="mobile-menu-button" class="md:hidden text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-colors">
+                        <i class="fas fa-bars w-4 h-4 sm:w-5 sm:h-5"></i>
                     </button>
                 </div>
             </div>
             
+            <!-- Mobile Search Bar (initially hidden) -->
+            <div id="mobile-search" class="sm:hidden hidden mt-3 mb-2">
+                <form action="{% url 'streamapp:search' %}" method="GET" class="flex items-center">
+                    <div class="relative w-full">
+                        <input type="text" name="q" placeholder="Cari anime..."
+                            class="w-full px-3 py-2 rounded-lg bg-white/80 dark:bg-white/10 backdrop-blur-md border border-primary/30 dark:border-white/20 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-red-500 text-sm" required>
+                        <button type="submit" class="absolute right-0 top-0 mt-2 mr-3 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
             <!-- Mobile Navigation Menu -->
-            <div id="mobile-menu" class="md:hidden hidden mt-4">
+            <div id="mobile-menu" class="md:hidden hidden mt-3 pb-2 border-t border-gray-200 dark:border-gray-700/30 pt-2">
                 <div class="flex flex-col space-y-2">
-                    <a href="{% url 'streamapp:index' %}" class="px-3 py-2 rounded-md text-base font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">Beranda</a>
-                    <a href="{% url 'streamapp:all_list_anime_terbaru' %}" class="px-3 py-2 rounded-md text-base font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">Anime Terbaru</a>
-                    <a href="{% url 'streamapp:all_list_jadwal_rilis' %}" class="px-3 py-2 rounded-md text-base font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">Jadwal Rilis</a>
-                    <a href="{% url 'streamapp:all_list_movie' %}" class="px-3 py-2 rounded-md text-base font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">Movie</a>
+                    <a href="{% url 'streamapp:index' %}" class="px-3 py-2 rounded-md text-base font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">
+                        <i class="fas fa-home mr-2"></i>Beranda
+                    </a>
+                    <a href="{% url 'streamapp:all_list_anime_terbaru' %}" class="px-3 py-2 rounded-md text-base font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">
+                        <i class="fas fa-fire mr-2"></i>Anime Terbaru
+                    </a>
+                    <a href="{% url 'streamapp:all_list_jadwal_rilis' %}" class="px-3 py-2 rounded-md text-base font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">
+                        <i class="fas fa-calendar mr-2"></i>Jadwal Rilis
+                    </a>
+                    <a href="{% url 'streamapp:all_list_movie' %}" class="px-3 py-2 rounded-md text-base font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">
+                        <i class="fas fa-film mr-2"></i>Movie
+                    </a>
+                    
                     <div class="grid grid-cols-3 gap-2 mt-2">
                         <a href="{% url 'streamapp:user_collection' %}?tab=watchlist" class="flex flex-col items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-black dark:text-white bg-primary/10 dark:bg-white/10 hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">
                             <i class="fas fa-bookmark mb-1"></i>
@@ -349,7 +378,35 @@
         document.getElementById('mobile-menu-button').addEventListener('click', function() {
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenu.classList.toggle('hidden');
+            
+            // Close mobile search if open
+            const mobileSearch = document.getElementById('mobile-search');
+            if (mobileSearch && !mobileSearch.classList.contains('hidden')) {
+                mobileSearch.classList.add('hidden');
+            }
         });
+        
+        // Toggle mobile search
+        const mobileSearchButton = document.getElementById('mobile-search-button');
+        if (mobileSearchButton) {
+            mobileSearchButton.addEventListener('click', function() {
+                const mobileSearch = document.getElementById('mobile-search');
+                mobileSearch.classList.toggle('hidden');
+                
+                // Focus the search input when shown
+                if (!mobileSearch.classList.contains('hidden')) {
+                    setTimeout(() => {
+                        mobileSearch.querySelector('input').focus();
+                    }, 100);
+                    
+                    // Close mobile menu if open
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+        }
         
         // Toggle theme (light/dark)
         document.getElementById('theme-toggle').addEventListener('click', function() {

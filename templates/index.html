@@ -34,6 +34,9 @@
                             DEFAULT: '#121212',
                             dark: '#000000',
                         },
+                    },
+                    screens: {
+                        'xs': '480px', // Tambahkan breakpoint untuk layar sangat kecil
                     }
                 }
             }
@@ -74,6 +77,27 @@
         
         .light-border {
             @apply border-primary-light/70 dark:border-gray-700/50;
+        }
+        
+        /* Responsive fixes */
+        @media (max-width: 640px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            h1, h2, h3 {
+                word-break: break-word;
+            }
+            
+            .xs\:text-sm {
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+            }
+            
+            .xs\:p-2 {
+                padding: 0.5rem;
+            }
         }
     </style>
     {% block content %}{% endblock content %}

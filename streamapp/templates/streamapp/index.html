@@ -74,18 +74,35 @@
         
         <!-- Top 10 Anime Carousel -->
         <div class="relative -mt-16 z-10 container mx-auto px-4">
-            <div class="light-bg backdrop-blur-md rounded-lg light-border p-6">
-                <div class="flex items-center mb-4">
-                    <i class="fas fa-trophy text-yellow-400 w-6 h-6 mr-2"></i>
-                    <h2 class="text-2xl font-bold light-text">Top 10 Anime Mingguan</h2>
+            <div class="light-bg backdrop-blur-md rounded-lg light-border p-4 sm:p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-trophy text-yellow-400 w-5 h-5 sm:w-6 sm:h-6 mr-2"></i>
+                        <h2 class="text-xl sm:text-2xl font-bold light-text">Top 10 Anime Mingguan</h2>
+                    </div>
+                    
+                    <!-- Scroll Controls for Desktop -->
+                    <div class="hidden md:flex space-x-2">
+                        <button id="scroll-left" class="p-2 rounded-full bg-primary/20 hover:bg-primary/40 dark:bg-white/10 dark:hover:bg-white/20 transition-colors">
+                            <i class="fas fa-chevron-left text-black dark:text-white"></i>
+                        </button>
+                        <button id="scroll-right" class="p-2 rounded-full bg-primary/20 hover:bg-primary/40 dark:bg-white/10 dark:hover:bg-white/20 transition-colors">
+                            <i class="fas fa-chevron-right text-black dark:text-white"></i>
+                        </button>
+                    </div>
                 </div>
                 
-                <div class="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide">
+                <!-- Swipe Instructions for Mobile -->
+                <div class="md:hidden text-center text-xs text-gray-500 dark:text-gray-400 mb-3">
+                    <i class="fas fa-hand-point-right mr-1"></i> Geser untuk melihat lebih banyak
+                </div>
+                
+                <div id="top-anime-carousel" class="flex overflow-x-auto pb-4 space-x-3 sm:space-x-4 scrollbar-hide scroll-smooth">
                     {% for anime in anime_mingguan %}
-                        <div class="group anime-card flex-shrink-0 w-[180px] light-bg backdrop-blur-md rounded-lg overflow-hidden light-border hover:bg-primary/10 dark:hover:bg-black/60 transition-all duration-300">
+                        <div class="group anime-card flex-shrink-0 w-[130px] sm:w-[150px] md:w-[180px] light-bg backdrop-blur-md rounded-lg overflow-hidden light-border hover:bg-primary/10 dark:hover:bg-black/60 transition-all duration-300">
                             <a href="{% if anime.anime_slug %}{% url 'streamapp:detail_anime' anime.anime_slug %}{% else %}{% url 'streamapp:detail_anime' anime.url|cut:'https://samehadaku.now/anime/'|cut:'/' %}{% endif %}" class="block">
                                 <div class="relative">
-                                    <img src="{{ anime.cover }}" alt="{{ anime.judul }}" class="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300">
+                                    <img src="{{ anime.cover }}" alt="{{ anime.judul }}" class="w-full h-28 sm:h-32 md:h-40 object-cover group-hover:scale-105 transition-transform duration-300">
                                     <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
                                     
                                     <!-- Rating Badge -->
@@ -247,7 +264,7 @@
         {% for day, anime_list in jadwal_rilis.items %}
             {% if forloop.counter <= 3 %}
                 <div class="mb-8">
-                    <h3 class="text-xl font-semibold light-text mb-4 pb-2 border-b light-border">{{ day }}</h3>
+                    <h3 class="text-xl font-semibold light-text mb-4 pb-2 border-b ">{{ day }}</h3>
                     
                     {% if anime_list %}
                         <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
@@ -317,6 +334,19 @@
     
     .hero-slide {
         transition: opacity 0.5s ease-in-out;
+    }
+    
+    /* Touch-based scrolling for mobile */
+    @media (max-width: 768px) {
+        #top-anime-carousel {
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x mandatory;
+            padding-bottom: 1rem;
+        }
+        
+        #top-anime-carousel > div {
+            scroll-snap-align: start;
+        }
     }
 </style>
 
@@ -604,6 +634,54 @@
                 }
             });
         });
+        
+        // Horizontal scroll buttons for Top 10 Anime
+        const scrollLeftBtn = document.getElementById('scroll-left');
+        const scrollRightBtn = document.getElementById('scroll-right');
+        const carousel = document.getElementById('top-anime-carousel');
+        
+        if (scrollLeftBtn && scrollRightBtn && carousel) {
+            // Scroll left button
+            scrollLeftBtn.addEventListener('click', function() {
+                carousel.scrollBy({
+                    left: -300,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Scroll right button
+            scrollRightBtn.addEventListener('click', function() {
+                carousel.scrollBy({
+                    left: 300,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Add touch swipe detection for mobile
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            carousel.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            }, false);
+            
+            carousel.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, false);
+            
+            function handleSwipe() {
+                const swipeDistance = touchStartX - touchEndX;
+                const cardWidth = 150; // Approximate card width
+                
+                if (Math.abs(swipeDistance) > 50) { // Minimum swipe distance
+                    carousel.scrollBy({
+                        left: swipeDistance > 0 ? cardWidth : -cardWidth,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        }
     });
 </script>
 {% endblock %}
