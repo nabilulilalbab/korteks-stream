@@ -14,7 +14,7 @@
         border-radius: 0.5rem;
     }
     
-    .video-container iframe, 
+    .video-container iframe,
     .video-container video {
         position: absolute;
         top: 0;
@@ -22,6 +22,36 @@
         width: 100%;
         height: 100%;
         border: none;
+    }
+    
+    /* Styling untuk container iklan */
+    .ad-container {
+        width: 100%;
+        overflow: hidden;
+        margin: 0 auto;
+        text-align: center;
+    }
+    
+    /* Styling untuk konten iklan */
+    .ad-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+    
+    /* Memastikan iframe dan gambar dalam iklan tidak melebihi ukuran container */
+    .ad-content iframe,
+    .ad-content img {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+    
+    /* Memastikan script-generated content tidak melebihi ukuran container */
+    .ad-content div,
+    .ad-content span,
+    .ad-content ins {
+        max-width: 100% !important;
     }
     
     @keyframes spin {
@@ -136,6 +166,19 @@
             </div>
         </div>
         
+        <!-- Iklan di atas player video -->
+        {% if ads.above_player %}
+        <div class="ad-container mb-4" style="{% if ads.above_player.max_width %}max-width: {{ ads.above_player.max_width }} !important;{% else %}max-width: 100%;{% endif %} margin: 0 auto;">
+            <div class="text-xs text-gray-400 text-center mb-1">Iklan</div>
+            <div class="ad-content light-bg backdrop-blur-sm rounded-lg p-2" style="{% if ads.above_player.max_height %}max-height: {{ ads.above_player.max_height }} !important; overflow-y: auto;{% endif %}">
+                {{ ads.above_player.ad_code|safe }}
+            </div>
+        </div>
+        {% else %}
+        <!-- Debug info: Tidak ada iklan untuk posisi above_player -->
+        <div class="text-xs text-gray-400 text-center mb-1" style="display: none;">Debug: Tidak ada iklan untuk posisi above_player</div>
+        {% endif %}
+        
         <!-- Video Player -->
         <div class="light-bg backdrop-blur-md rounded-xl shadow-lg p-6 mb-8 light-border">
             <div class="video-container mb-6 rounded-lg overflow-hidden" id="player-frame">
@@ -152,70 +195,78 @@
             </div>
             
             {% if episode.streaming_servers %}
-                <div class="flex flex-wrap gap-3 mb-4">
-                    {% for server in episode.streaming_servers %}
-                        {% if "Nakama" in server.server_name %}
-                            <!-- Prioritaskan server Nakama -->
-                            <button class="px-4 py-2 light-bg backdrop-blur-sm light-text rounded-lg hover:bg-primary/60 transition-colors light-border"
-                                    data-url="{{ server.streaming_url }}"
-                                    data-server-type="nakama"
-                                    onclick="changeServer(this)">
-                                {{ server.server_name }}
-                            </button>
-                        {% elif "Pucuk" in server.server_name %}
-                            <button class="px-4 py-2 light-bg backdrop-blur-sm light-text rounded-lg hover:bg-primary/60 transition-colors light-border"
-                                    data-url="{{ server.streaming_url }}"
-                                    data-server-type="pucuk"
-                                    onclick="changeServer(this)">
-                                {{ server.server_name }}
-                            </button>
-                        {% elif "Premium" in server.server_name %}
-                            <button class="px-4 py-2 light-bg backdrop-blur-sm light-text rounded-lg hover:bg-primary/60 transition-colors light-border"
-                                    data-url="{{ server.streaming_url }}"
-                                    data-server-type="premium"
-                                    onclick="changeServer(this)">
-                                {{ server.server_name }}
-                            </button>
-                        {% elif "Mega" in server.server_name %}
-                            <button class="px-4 py-2 light-bg backdrop-blur-sm light-text rounded-lg hover:bg-primary/60 transition-colors light-border"
-                                    data-url="{{ server.streaming_url }}"
-                                    data-server-type="mega"
-                                    onclick="changeServer(this)">
-                                {{ server.server_name }}
-                            </button>
-                        {% elif "Blogspot" in server.server_name %}
-                            <button class="px-4 py-2 light-bg backdrop-blur-sm light-text rounded-lg hover:bg-primary/60 transition-colors light-border"
-                                    data-url="{{ server.streaming_url }}"
-                                    data-server-type="blogspot"
-                                    onclick="changeServer(this)">
-                                {{ server.server_name }}
-                            </button>
-                        {% else %}
-                            <button class="px-4 py-2 light-bg backdrop-blur-sm light-text rounded-lg hover:bg-primary/60 transition-colors light-border"
-                                    data-url="{{ server.streaming_url }}"
-                                    data-server-type="other"
-                                    onclick="changeServer(this)">
-                                {{ server.server_name }}
-                            </button>
-                        {% endif %}
-                    {% endfor %}
+                <div class="mb-4">
+                    <div class="relative">
+                        <select id="server-select" class="w-full px-4 py-3 light-bg backdrop-blur-sm light-text rounded-lg light-border appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-base font-medium">
+                            <option value="" disabled selected>Pilih Server Streaming</option>
+                            {% for server in episode.streaming_servers %}
+                                {% if "Nakama" in server.server_name %}
+                                    <option value="{{ server.streaming_url }}" data-server-type="nakama" class="py-2">{{ server.server_name }}</option>
+                                {% elif "Pucuk" in server.server_name %}
+                                    <option value="{{ server.streaming_url }}" data-server-type="pucuk" class="py-2">{{ server.server_name }}</option>
+                                {% elif "Premium" in server.server_name %}
+                                    <option value="{{ server.streaming_url }}" data-server-type="premium" class="py-2">{{ server.server_name }}</option>
+                                {% elif "Mega" in server.server_name %}
+                                    <option value="{{ server.streaming_url }}" data-server-type="mega" class="py-2">{{ server.server_name }}</option>
+                                {% elif "Blogspot" in server.server_name %}
+                                    <option value="{{ server.streaming_url }}" data-server-type="blogspot" class="py-2">{{ server.server_name }}</option>
+                                {% else %}
+                                    <option value="{{ server.streaming_url }}" data-server-type="other" class="py-2">{{ server.server_name }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                            <div class="bg-primary/20 rounded-full w-8 h-8 flex items-center justify-center">
+                                <i class="fas fa-chevron-down text-primary text-lg"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             {% endif %}
         </div>
+        
+        <!-- Iklan di bawah player video -->
+        {% if ads.below_player %}
+        <div class="ad-container mb-8" style="{% if ads.below_player.max_width %}max-width: {{ ads.below_player.max_width }} !important;{% else %}max-width: 100%;{% endif %} margin: 0 auto;">
+            <div class="text-xs text-gray-400 text-center mb-1">Iklan</div>
+            <div class="ad-content light-bg backdrop-blur-sm rounded-lg p-2" style="{% if ads.below_player.max_height %}max-height: {{ ads.below_player.max_height }} !important; overflow-y: auto;{% endif %}">
+                {{ ads.below_player.ad_code|safe }}
+            </div>
+        </div>
+        {% endif %}
         
         <!-- Anime Info -->
         {% if episode.anime_info %}
             <div class="light-bg backdrop-blur-md rounded-xl shadow-lg p-6 mb-8 light-border">
                 <h2 class="text-xl font-bold light-text mb-4 pb-2 border-b light-border">Informasi Anime</h2>
                 <h3 class="text-lg font-semibold light-text mb-2">{{ episode.anime_info.title }}</h3>
-                <p class="light-text mb-4">{{ episode.anime_info.synopsis }}</p>
+                
+                <!-- Sinopsis dengan Show More/Less -->
+                <div class="relative">
+                    <div id="synopsis-container" class="light-text mb-4 overflow-hidden transition-all duration-300" style="max-height: 100px;">
+                        <p>{{ episode.anime_info.synopsis }}</p>
+                    </div>
+                    <div id="synopsis-gradient" class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/40 to-transparent"></div>
+                    <button id="synopsis-toggle" class="text-primary hover:text-primary/80 text-sm font-medium transition-colors px-3 py-1 rounded-md bg-primary/10 hover:bg-primary/20 cursor-pointer z-10 relative">
+                        Baca Selengkapnya
+                    </button>
+                </div>
                 
                 {% if episode.anime_info.genres %}
-                    <div class="flex flex-wrap gap-2">
+                    <div class="flex flex-wrap gap-2 mt-4">
                         {% for genre in episode.anime_info.genres %}
                             <span class="bg-primary/40 backdrop-blur-sm text-white px-2 py-1 rounded-md text-sm">{{ genre }}</span>
                         {% endfor %}
                     </div>
+                {% endif %}
+                <!-- Iklan di antara informasi anime -->
+                {% if ads.between_info %}
+                <div class="ad-container my-4" style="{% if ads.between_info.max_width %}max-width: {{ ads.between_info.max_width }} !important;{% else %}max-width: 100%;{% endif %} margin: 0 auto;">
+                    <div class="text-xs text-gray-400 text-center mb-1">Iklan</div>
+                    <div class="ad-content light-bg backdrop-blur-sm rounded-lg p-2" style="{% if ads.between_info.max_height %}max-height: {{ ads.between_info.max_height }} !important; overflow-y: auto;{% endif %}">
+                        {{ ads.between_info.ad_code|safe }}
+                    </div>
+                </div>
                 {% endif %}
             </div>
         {% endif %}
@@ -262,30 +313,79 @@
             </div>
         {% endif %}
         
+        <!-- Iklan di atas download links -->
+        {% if ads.above_download %}
+        <div class="ad-container mb-8" style="{% if ads.above_download.max_width %}max-width: {{ ads.above_download.max_width }} !important;{% else %}max-width: 100%;{% endif %} margin: 0 auto;">
+            <div class="text-xs text-gray-400 text-center mb-1">Iklan</div>
+            <div class="ad-content light-bg backdrop-blur-sm rounded-lg p-2" style="{% if ads.above_download.max_height %}max-height: {{ ads.above_download.max_height }} !important; overflow-y: auto;{% endif %}">
+                {{ ads.above_download.ad_code|safe }}
+            </div>
+        </div>
+        {% endif %}
+        
         <!-- Download Links -->
         {% if episode.download_links %}
             <div class="light-bg backdrop-blur-md rounded-xl shadow-lg p-6 mb-8 light-border">
-                <h2 class="text-xl font-bold light-text mb-4 pb-2 border-b ">Download Links</h2>
+                <h2 class="text-xl font-bold light-text mb-4 pb-2 border-b">Download Links</h2>
                 
-                {% for format_type, resolutions in episode.download_links.items %}
-                    <div class="mb-6">
-                        <h3 class="text-lg font-semibold light-text mb-3 pb-1 border-b ">{{ format_type }}</h3>
-                        
-                        {% for resolution, providers in resolutions.items %}
-                            <div class="mb-4">
-                                <h4 class="text-md font-medium light-text mb-2">{{ resolution }}</h4>
-                                <div class="flex flex-wrap gap-2">
-                                    {% for provider in providers %}
-                                        <a href="{{ provider.url }}" class="px-3 py-1 bg-primary/80 backdrop-blur-sm text-white text-sm rounded-lg hover:bg-primary transition-colors border border-primary/30" target="_blank">
-                                            {{ provider.provider }}
-                                        </a>
-                                    {% endfor %}
-                                </div>
+                <div class="space-y-4">
+                    {% for format_type, resolutions in episode.download_links.items %}
+                        <div class="download-format-container">
+                            <!-- Format Type Dropdown Toggle -->
+                            <button class="format-toggle w-full flex justify-between items-center py-2 px-4 light-bg backdrop-blur-sm light-text rounded-lg hover:bg-primary/20 transition-colors light-border mb-2"
+                                    data-format="{{ format_type|slugify }}">
+                                <span class="text-lg font-semibold">{{ format_type }}</span>
+                                <i class="fas fa-chevron-down text-primary transition-transform duration-300"></i>
+                            </button>
+                            
+                            <!-- Format Content (Hidden by default) -->
+                            <div class="format-content hidden pl-4 space-y-3" id="format-{{ format_type|slugify }}">
+                                {% for resolution, providers in resolutions.items %}
+                                    <div class="resolution-container">
+                                        <!-- Resolution Toggle -->
+                                        <button class="resolution-toggle w-full flex justify-between items-center py-1 px-3 light-bg backdrop-blur-sm light-text rounded-lg hover:bg-primary/10 transition-colors light-border mb-1"
+                                                data-resolution="{{ resolution|slugify }}-{{ format_type|slugify }}">
+                                            <span class="font-medium">{{ resolution }}</span>
+                                            <i class="fas fa-chevron-down text-primary transition-transform duration-300"></i>
+                                        </button>
+                                        
+                                        <!-- Providers (Hidden by default) -->
+                                        <div class="providers-container hidden pl-3 pt-1 pb-2" id="resolution-{{ resolution|slugify }}-{{ format_type|slugify }}">
+                                            <div class="flex flex-wrap gap-2">
+                                                {% for provider in providers %}
+                                                    <a href="{{ provider.url }}" class="px-3 py-1 bg-primary/80 backdrop-blur-sm text-white text-sm rounded-lg hover:bg-primary transition-colors border border-primary/30" target="_blank">
+                                                        {{ provider.provider }}
+                                                    </a>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
                             </div>
-                        {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Iklan di antara download links -->
+                {% if ads.between_download %}
+                <div class="ad-container my-4" style="{% if ads.between_download.max_width %}max-width: {{ ads.between_download.max_width }} !important;{% else %}max-width: 100%;{% endif %} margin: 0 auto;">
+                    <div class="text-xs text-gray-400 text-center mb-1">Iklan</div>
+                    <div class="ad-content light-bg backdrop-blur-sm rounded-lg p-2" style="{% if ads.between_download.max_height %}max-height: {{ ads.between_download.max_height }} !important; overflow-y: auto;{% endif %}">
+                        {{ ads.between_download.ad_code|safe }}
                     </div>
-                {% endfor %}
+                </div>
+                {% endif %}
             </div>
+        {% endif %}
+        
+        <!-- Iklan di footer -->
+        {% if ads.footer %}
+        <div class="ad-container mb-8" style="{% if ads.footer.max_width %}max-width: {{ ads.footer.max_width }} !important;{% else %}max-width: 100%;{% endif %} margin: 0 auto;">
+            <div class="text-xs text-gray-400 text-center mb-1">Iklan</div>
+            <div class="ad-content light-bg backdrop-blur-sm rounded-lg p-2" style="{% if ads.footer.max_height %}max-height: {{ ads.footer.max_height }} !important; overflow-y: auto;{% endif %}">
+                {{ ads.footer.ad_code|safe }}
+            </div>
+        </div>
         {% endif %}
     {% else %}
         <div class="light-bg backdrop-blur-md border border-red-500/50 text-red-300 px-4 py-3 rounded-xl mb-8 text-center py-12">
@@ -293,6 +393,8 @@
             <p>Silakan coba lagi nanti atau kembali ke beranda.</p>
         </div>
     {% endif %}
+    
+    
 </div>
 {% endblock %}
 
@@ -963,22 +1065,170 @@
         return url;
     }
     
-    // Fungsi utama untuk mengubah server
+    // Fungsi utama untuk mengubah server (untuk kompatibilitas dengan kode lama)
     function changeServer(button) {
-        // Hapus kelas active dari semua tombol
-        document.querySelectorAll('[data-server-type]').forEach(btn => {
-            btn.classList.remove('bg-primary/60');
-            btn.classList.add('light-bg');
-        });
-        
-        // Tambahkan kelas active ke tombol yang diklik
-        button.classList.remove('bg-black/50');
-        button.classList.add('bg-primary/60');
-        
         // Dapatkan URL dan tipe server
         let url = button.getAttribute('data-url');
         const serverType = button.getAttribute('data-server-type');
         
+        // Panggil fungsi baru dengan parameter yang sama
+        changeServerFromSelect(url, serverType, button.textContent.trim());
+    }
+    
+    // Pilih server default saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', function() {
+        // Urutan prioritas: Nakama > Pucuk > Blogspot > Premium > Mega > yang lain
+        const serverSelect = document.getElementById('server-select');
+        
+        if (serverSelect) {
+            // Tambahkan event listener untuk perubahan server
+            serverSelect.addEventListener('change', function() {
+                const selectedOption = serverSelect.options[serverSelect.selectedIndex];
+                const url = selectedOption.value;
+                const serverType = selectedOption.getAttribute('data-server-type');
+                
+                // Panggil fungsi untuk mengubah server
+                changeServerFromSelect(url, serverType, selectedOption.textContent.trim());
+            });
+            
+            // Pilih server default berdasarkan prioritas
+            let defaultServerIndex = 0;
+            
+            // Cari server Nakama
+            for (let i = 0; i < serverSelect.options.length; i++) {
+                const option = serverSelect.options[i];
+                const serverType = option.getAttribute('data-server-type');
+                
+                if (serverType === 'nakama') {
+                    defaultServerIndex = i;
+                    break;
+                } else if (serverType === 'pucuk' && defaultServerIndex === 0) {
+                    defaultServerIndex = i;
+                } else if (serverType === 'blogspot' && defaultServerIndex === 0) {
+                    defaultServerIndex = i;
+                } else if (serverType === 'premium' && defaultServerIndex === 0) {
+                    defaultServerIndex = i;
+                } else if (serverType === 'mega' && defaultServerIndex === 0) {
+                    defaultServerIndex = i;
+                }
+            }
+            
+            // Pilih server default jika ada
+            if (defaultServerIndex > 0) {
+                serverSelect.selectedIndex = defaultServerIndex;
+                // Trigger change event
+                const event = new Event('change');
+                serverSelect.dispatchEvent(event);
+            }
+        }
+        
+        // Inisialisasi toggle untuk sinopsis
+        initSynopsisToggle();
+        
+        // Inisialisasi toggle untuk download links
+        initDownloadToggles();
+    });
+    
+    // Fungsi untuk menginisialisasi toggle sinopsis
+    function initSynopsisToggle() {
+        const container = document.getElementById('synopsis-container');
+        const gradient = document.getElementById('synopsis-gradient');
+        const toggle = document.getElementById('synopsis-toggle');
+        
+        if (container && gradient && toggle) {
+            console.log("Inisialisasi toggle sinopsis");
+            
+            // Periksa apakah sinopsis cukup panjang untuk memerlukan toggle
+            if (container.scrollHeight <= 100) {
+                console.log("Sinopsis pendek, tidak perlu toggle");
+                gradient.style.display = 'none';
+                toggle.style.display = 'none';
+                container.style.maxHeight = 'none';
+                return;
+            }
+            
+            console.log("Sinopsis panjang, menambahkan event listener");
+            
+            // Variabel untuk melacak status
+            let isExpanded = false;
+            
+            // Tambahkan event listener untuk toggle
+            toggle.addEventListener('click', function(e) {
+                console.log("Toggle sinopsis diklik");
+                e.preventDefault();
+                
+                if (!isExpanded) {
+                    // Expand
+                    console.log("Memperluas sinopsis");
+                    container.style.maxHeight = container.scrollHeight + 'px';
+                    gradient.style.display = 'none';
+                    toggle.textContent = 'Sembunyikan';
+                    toggle.classList.add('bg-primary/20');
+                    toggle.classList.remove('bg-primary/10');
+                    isExpanded = true;
+                } else {
+                    // Collapse
+                    console.log("Menyembunyikan sinopsis");
+                    container.style.maxHeight = '100px';
+                    gradient.style.display = 'block';
+                    toggle.textContent = 'Baca Selengkapnya';
+                    toggle.classList.remove('bg-primary/20');
+                    toggle.classList.add('bg-primary/10');
+                    isExpanded = false;
+                }
+            });
+            
+            // Pastikan toggle terlihat dan dapat diklik
+            toggle.style.display = 'inline-block';
+            toggle.style.cursor = 'pointer';
+            toggle.style.zIndex = '10';
+            toggle.style.position = 'relative';
+        } else {
+            console.error("Elemen sinopsis tidak ditemukan");
+        }
+    }
+    
+    // Fungsi untuk menginisialisasi toggle download links
+    function initDownloadToggles() {
+        // Format toggles
+        const formatToggles = document.querySelectorAll('.format-toggle');
+        formatToggles.forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const formatId = this.getAttribute('data-format');
+                const content = document.getElementById('format-' + formatId);
+                const icon = this.querySelector('i');
+                
+                if (content.classList.contains('hidden')) {
+                    content.classList.remove('hidden');
+                    icon.classList.add('rotate-180');
+                } else {
+                    content.classList.add('hidden');
+                    icon.classList.remove('rotate-180');
+                }
+            });
+        });
+        
+        // Resolution toggles
+        const resolutionToggles = document.querySelectorAll('.resolution-toggle');
+        resolutionToggles.forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const resolutionId = this.getAttribute('data-resolution');
+                const content = document.getElementById('resolution-' + resolutionId);
+                const icon = this.querySelector('i');
+                
+                if (content.classList.contains('hidden')) {
+                    content.classList.remove('hidden');
+                    icon.classList.add('rotate-180');
+                } else {
+                    content.classList.add('hidden');
+                    icon.classList.remove('rotate-180');
+                }
+            });
+        });
+    }
+    
+    // Fungsi untuk mengubah server dari dropdown select
+    function changeServerFromSelect(url, serverType, serverName) {
         // Konversi URL Pixeldrain jika diperlukan
         if (url && url.includes('pixeldrain.com/u/')) {
             url = convertPixeldrainUrl(url);
@@ -988,7 +1238,7 @@
         const playerFrame = document.getElementById('player-frame');
         playerFrame.innerHTML = `
             <div class="flex justify-center items-center h-full flex-col bg-black/70 text-white">
-                <p class="text-lg mb-4">Memuat server ${button.textContent.trim()}...</p>
+                <p class="text-lg mb-4">Memuat server ${serverName}...</p>
                 <div class="w-10 h-10 border-4 border-gray-600 border-t-primary rounded-full animate-spin"></div>
             </div>
         `;
@@ -1034,61 +1284,15 @@
                     
                     // Tambahkan event listener untuk mendeteksi error
                     newIframe.onerror = function() {
-                        showErrorMessage(`Gagal memuat server ${button.textContent.trim()}. Coba server lain.`);
+                        showErrorMessage(`Gagal memuat server ${serverName}. Coba server lain.`);
                     };
                 } catch (error) {
                     console.error("Error loading server:", error);
-                    showErrorMessage(`Gagal memuat server ${button.textContent.trim()}. Coba server lain.`);
+                    showErrorMessage(`Gagal memuat server ${serverName}. Coba server lain.`);
                 }
                 break;
         }
     }
-    
-    // Pilih server default saat halaman dimuat
-    document.addEventListener('DOMContentLoaded', function() {
-        // Urutan prioritas: Nakama > Pucuk > Blogspot > Premium > Mega > yang lain
-        
-        // Coba pilih server Nakama terlebih dahulu
-        const nakamaButton = document.querySelector('[data-server-type="nakama"]');
-        if (nakamaButton) {
-            nakamaButton.click();
-            return;
-        }
-        
-        // Jika tidak ada server Nakama, coba server Pucuk
-        const pucukButton = document.querySelector('[data-server-type="pucuk"]');
-        if (pucukButton) {
-            pucukButton.click();
-            return;
-        }
-        
-        // Jika tidak ada server Pucuk, coba server Blogspot
-        const blogspotButton = document.querySelector('[data-server-type="blogspot"]');
-        if (blogspotButton) {
-            blogspotButton.click();
-            return;
-        }
-        
-        // Jika tidak ada server Blogspot, coba server Premium
-        const premiumButton = document.querySelector('[data-server-type="premium"]');
-        if (premiumButton) {
-            premiumButton.click();
-            return;
-        }
-        
-        // Jika tidak ada server Premium, coba server Mega
-        const megaButton = document.querySelector('[data-server-type="mega"]');
-        if (megaButton) {
-            megaButton.click();
-            return;
-        }
-        
-        // Jika tidak ada server yang diutamakan, pilih server pertama
-        const firstButton = document.querySelector('[data-server-type]');
-        if (firstButton) {
-            firstButton.click();
-        }
-    });
 </script>
 
 <style>
@@ -1119,5 +1323,35 @@
     .animate-fade-out {
         animation: fadeOut 0.5s ease-out forwards;
     }
+    
+    /* Script untuk memastikan iklan tidak melebihi ukuran container */
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fungsi untuk menyesuaikan ukuran iframe dalam iklan
+        function resizeAdIframes() {
+            const adContents = document.querySelectorAll('.ad-content');
+            
+            adContents.forEach(function(adContent) {
+                const iframes = adContent.querySelectorAll('iframe');
+                const maxWidth = adContent.parentElement.style.maxWidth;
+                
+                iframes.forEach(function(iframe) {
+                    iframe.style.maxWidth = '100%';
+                    
+                    // Jika iframe terlalu tinggi, batasi tingginya
+                    if (iframe.height > 600) {
+                        iframe.style.height = '600px';
+                    }
+                });
+            });
+        }
+        
+        // Jalankan fungsi setelah halaman dimuat dan setiap 1 detik selama 5 detik
+        // untuk menangani iklan yang dimuat secara asinkron
+        resizeAdIframes();
+        
+        for (let i = 1; i <= 5; i++) {
+            setTimeout(resizeAdIframes, i * 1000);
+        }
+    });
 </style>
 {% endblock %}

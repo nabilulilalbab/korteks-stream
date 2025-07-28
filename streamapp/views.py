@@ -12,6 +12,10 @@ from bs4 import BeautifulSoup
 from django.core.cache import cache
 import time
 import functools
+from .models import Advertisement
+from django.utils import timezone
+from django.db import models
+from asgiref.sync import sync_to_async
 
 # Fungsi untuk mengambil HTML dari URL
 def get_html_content(url, headers=None):
@@ -407,6 +411,71 @@ async def get_detail_episode_data(episode_url):
         print(f"Error saat mendapatkan detail episode: {e}")
         return None
 
+# Fungsi sinkron untuk mendapatkan iklan aktif
+def get_active_ads_sync(position=None):
+    """
+    Fungsi sinkron untuk mendapatkan iklan yang aktif berdasarkan posisi.
+    """
+    try:
+        now = timezone.now()
+        print(f"Current time: {now}")
+        
+        # Dapatkan semua iklan untuk debugging
+        all_ads = list(Advertisement.objects.all())
+        print(f"Total iklan di database: {len(all_ads)}")
+        for ad in all_ads:
+            print(f"Iklan: {ad.name}, Posisi: {ad.position}, Aktif: {ad.is_active}, Start: {ad.start_date}, End: {ad.end_date}")
+        
+        # Filter iklan yang aktif dan dalam rentang tanggal yang valid
+        ads_query = Advertisement.objects.filter(is_active=True)
+        print(f"Iklan aktif: {ads_query.count()}")
+        
+        # Filter berdasarkan tanggal mulai dan berakhir
+        date_filtered = ads_query.filter(
+            (models.Q(start_date__isnull=True) | models.Q(start_date__lte=now)) &
+            (models.Q(end_date__isnull=True) | models.Q(end_date__gte=now))
+        )
+        print(f"Iklan dalam rentang tanggal valid: {date_filtered.count()}")
+        
+        # Filter berdasarkan posisi jika ada
+        if position:
+            position_filtered = date_filtered.filter(position=position)
+            print(f"Iklan untuk posisi {position}: {position_filtered.count()}")
+        else:
+            position_filtered = date_filtered
+            print("Tidak ada filter posisi")
+        
+        # Urutkan berdasarkan prioritas (tinggi ke rendah)
+        ordered_ads = position_filtered.order_by('-priority')
+        
+        # Konversi queryset ke list
+        result = list(ordered_ads)
+        print(f"Hasil akhir: {len(result)} iklan")
+        for ad in result:
+            print(f"Iklan hasil: {ad.name}, Posisi: {ad.position}")
+        
+        return result
+    except Exception as e:
+        print(f"Error saat mendapatkan iklan aktif: {e}")
+        import traceback
+        traceback.print_exc()
+        return []
+
+# Fungsi asinkron yang memanggil fungsi sinkron menggunakan sync_to_async
+async def get_active_ads(position=None):
+    """
+    Fungsi asinkron untuk mendapatkan iklan yang aktif berdasarkan posisi.
+    Menggunakan sync_to_async untuk memanggil fungsi sinkron dari konteks asinkron.
+    """
+    try:
+        # Gunakan sync_to_async untuk memanggil fungsi sinkron dari konteks asinkron
+        return await sync_to_async(get_active_ads_sync)(position)
+    except Exception as e:
+        print(f"Error saat mendapatkan iklan aktif (async): {e}")
+        import traceback
+        traceback.print_exc()
+        return []
+
 async def detail_episode_video(request, episode_slug=None):
     """
     View untuk menampilkan detail episode dengan video player.
@@ -426,9 +495,69 @@ async def detail_episode_video(request, episode_slug=None):
         if not episode_data:
             return render(request, 'streamapp/detail_episode_video.html', {'error': 'Episode tidak ditemukan'})
         
-        # Render template dengan data episode
+        # Dapatkan iklan yang aktif untuk berbagai posisi
+        ads = {}
+        debug_info = {
+            'has_advertisement_model': 'Advertisement' in globals(),
+            'positions': [],
+            'ads_found': {},
+            'errors': []
+        }
+        
+        try:
+            # Hanya coba dapatkan iklan jika model Advertisement ada
+            if 'Advertisement' in globals():
+                print("Model Advertisement ditemukan, mencoba mendapatkan iklan")
+                positions = [pos[0] for pos in Advertisement.POSITION_CHOICES]
+                debug_info['positions'] = positions
+                print(f"Posisi iklan yang tersedia: {positions}")
+                
+                # Dapatkan semua iklan untuk debugging (menggunakan sync_to_async)
+                all_ads = await sync_to_async(list)(Advertisement.objects.all())
+                debug_info['total_ads'] = len(all_ads)
+                debug_info['all_ads'] = [{'name': ad.name, 'position': ad.position, 'is_active': ad.is_active} for ad in all_ads]
+                
+                for position in positions:
+                    print(f"Mencoba mendapatkan iklan untuk posisi: {position}")
+                    position_ads = await get_active_ads(position)
+                    debug_info['ads_found'][position] = len(position_ads)
+                    
+                    if position_ads:
+                        # Ambil iklan dengan prioritas tertinggi untuk posisi ini
+                        ads[position] = position_ads[0]
+                        print(f"Iklan ditemukan untuk posisi {position}: {position_ads[0].name}")
+                    else:
+                        print(f"Tidak ada iklan untuk posisi {position}")
+                
+                print(f"Total iklan yang akan ditampilkan: {len(ads)}")
+                for pos, ad in ads.items():
+                    print(f"Posisi: {pos}, Iklan: {ad.name}, Kode: {ad.ad_code[:30]}...")
+            else:
+                print("Model Advertisement tidak ditemukan")
+                debug_info['errors'].append("Model Advertisement tidak ditemukan")
+        except Exception as ad_error:
+            print(f"Error saat mendapatkan iklan: {ad_error}")
+            import traceback
+            traceback.print_exc()
+            debug_info['errors'].append(str(ad_error))
+            # Jika ada error dengan iklan, tetap lanjutkan tanpa iklan
+            ads = {}
+        
+        # Pastikan episode_data memiliki semua field yang diperlukan
+        if not episode_data.get('navigation'):
+            episode_data['navigation'] = {}
+        
+        if not episode_data.get('anime_info'):
+            episode_data['anime_info'] = {}
+        
+        if not episode_data.get('other_episodes'):
+            episode_data['other_episodes'] = []
+        
+        # Render template dengan data episode, iklan, dan debug info
         context = {
-            'episode': episode_data
+            'episode': episode_data,
+            'ads': ads,
+            'debug_info': debug_info
         }
         
         return render(request, 'streamapp/detail_episode_video.html', context=context)
