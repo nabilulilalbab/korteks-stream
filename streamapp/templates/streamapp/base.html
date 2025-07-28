@@ -26,28 +26,22 @@
             theme: {
                 extend: {
                     colors: {
-                        // Warna utama untuk light mode
+                        // Warna utama yang konsisten untuk light dan dark mode
                         primary: {
-                            light: '#ffd700', // gold
-                            DEFAULT: '#daa520', // goldenrod
-                            dark: '#b8860b', // darkgoldenrod
+                            light: '#ffd700', // gold untuk light mode
+                            DEFAULT: '#daa520', // goldenrod untuk light mode
+                            dark: '#b8860b', // darkgoldenrod untuk light mode
                         },
-                        secondary: {
-                            light: '#ffffff',
-                            DEFAULT: '#f8f9fa',
-                            dark: '#e9ecef',
+                        // Warna background dan text
+                        page: {
+                            light: '#ffffff', // background light mode
+                            DEFAULT: '#f8f9fa', // background light mode
+                            dark: '#121212', // background dark mode
                         },
-                        
-                        // Dark mode colors
-                        darkPrimary: {
-                            light: '#f87171', // red-400
-                            DEFAULT: '#dc2626', // red-600
-                            dark: '#b91c1c', // red-700
-                        },
-                        darkSecondary: {
-                            light: '#1a1a1a', // Hitam dengan gradasi
-                            DEFAULT: '#121212',
-                            dark: '#000000',
+                        content: {
+                            light: '#1a1a1a', // text light mode
+                            DEFAULT: '#000000', // text light mode
+                            dark: '#ffffff', // text dark mode
                         },
                     },
                     backdropBlur: {
@@ -156,12 +150,46 @@
             background: #ffffff;
             color: #000000;
             background-attachment: fixed;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         
         .dark body {
             background: linear-gradient(to bottom right, #000000, #450a0a, #000000);
             background-attachment: fixed;
             color: #ffffff;
+        }
+        
+        /* Light mode specific styles */
+        .light-bg {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-color: #daa520; /* Border kuning keemasan */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .dark .light-bg {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-color: rgba(75, 85, 99, 0.5);
+            box-shadow: none;
+        }
+        
+        .light-text {
+            color: #000000;
+            font-weight: 500;
+        }
+        
+        .dark .light-text {
+            color: #ffffff;
+            font-weight: normal;
+        }
+        
+        .light-border {
+            border-color: #daa520; /* Border kuning keemasan */
+            border-width: 1px;
+        }
+        
+        .dark .light-border {
+            border-color: rgba(75, 85, 99, 0.5);
+            border-width: 1px;
         }
         
         /* Styling untuk notifikasi */
@@ -196,21 +224,21 @@
 </head>
 <body class="theme-transition min-h-screen flex flex-col dark:text-white text-black">
     <!-- Navbar -->
-    <nav class="sticky top-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/10">
+    <nav class="sticky top-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/10 dark:bg-black/20 dark:border-white/10">
         <div class="container mx-auto px-4 py-4">
             <div class="flex justify-between items-center">
                 <div class="flex items-center">
                     <!-- Logo -->
                     <a href="{% url 'streamapp:index' %}" class="flex-shrink-0 flex items-center">
-                        <span class="text-2xl font-bold text-white">🎌 Kortek<span class="text-red-500">Stream</span></span>
+                        <span class="text-2xl font-bold text-black dark:text-white">🎌 Kortek<span class="text-red-500">Stream</span></span>
                     </a>
                     
                     <!-- Desktop Navigation Links -->
                     <div class="hidden md:ml-6 md:flex md:space-x-4">
-                        <a href="{% url 'streamapp:index' %}" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/20 transition-colors">Beranda</a>
-                        <a href="{% url 'streamapp:all_list_anime_terbaru' %}" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/20 transition-colors">Anime Terbaru</a>
-                        <a href="{% url 'streamapp:all_list_jadwal_rilis' %}" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/20 transition-colors">Jadwal Rilis</a>
-                        <a href="{% url 'streamapp:all_list_movie' %}" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/20 transition-colors">Movie</a>
+                        <a href="{% url 'streamapp:index' %}" class="px-3 py-2 rounded-md text-sm font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">Beranda</a>
+                        <a href="{% url 'streamapp:all_list_anime_terbaru' %}" class="px-3 py-2 rounded-md text-sm font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">Anime Terbaru</a>
+                        <a href="{% url 'streamapp:all_list_jadwal_rilis' %}" class="px-3 py-2 rounded-md text-sm font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">Jadwal Rilis</a>
+                        <a href="{% url 'streamapp:all_list_movie' %}" class="px-3 py-2 rounded-md text-sm font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">Movie</a>
                     </div>
                 </div>
                 
@@ -219,34 +247,34 @@
                     <div class="relative flex-1 max-w-md">
                         <form action="{% url 'streamapp:search' %}" method="GET" class="flex items-center">
                             <input type="text" name="q" placeholder="Cari anime..."
-                                class="w-full px-4 py-2 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500" required>
-                            <button type="submit" class="absolute right-0 top-0 mt-2 mr-3 text-gray-400 hover:text-white">
+                                class="w-full px-4 py-2 rounded-lg bg-white/80 dark:bg-white/10 backdrop-blur-md border border-primary/30 dark:border-white/20 text-black dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-red-500" required>
+                            <button type="submit" class="absolute right-0 top-0 mt-2 mr-3 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white">
                                 <i class="fas fa-search"></i>
                             </button>
                         </form>
                     </div>
                     
                     <!-- Collection Links -->
-                    <a href="{% url 'streamapp:user_collection' %}?tab=watchlist" class="text-white hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
+                    <a href="{% url 'streamapp:user_collection' %}?tab=watchlist" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
                         <i class="fas fa-bookmark w-5 h-5"></i>
                     </a>
                     
-                    <a href="{% url 'streamapp:user_collection' %}?tab=favorites" class="text-white hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
+                    <a href="{% url 'streamapp:user_collection' %}?tab=favorites" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
                         <i class="fas fa-heart w-5 h-5"></i>
                     </a>
                     
-                    <a href="{% url 'streamapp:user_collection' %}?tab=history" class="text-white hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
+                    <a href="{% url 'streamapp:user_collection' %}?tab=history" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
                         <i class="fas fa-clock w-5 h-5"></i>
                     </a>
                     
                     <!-- Theme Toggle -->
-                    <button id="theme-toggle" class="text-white hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
+                    <button id="theme-toggle" class="text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
                         <i class="fas fa-sun dark:hidden w-5 h-5"></i>
                         <i class="fas fa-moon hidden dark:inline w-5 h-5"></i>
                     </button>
                     
                     <!-- Mobile menu button -->
-                    <button id="mobile-menu-button" class="md:hidden text-white hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
+                    <button id="mobile-menu-button" class="md:hidden text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 w-10 h-10 rounded-full flex items-center justify-center transition-colors">
                         <i class="fas fa-bars w-5 h-5"></i>
                     </button>
                 </div>
@@ -255,20 +283,20 @@
             <!-- Mobile Navigation Menu -->
             <div id="mobile-menu" class="md:hidden hidden mt-4">
                 <div class="flex flex-col space-y-2">
-                    <a href="{% url 'streamapp:index' %}" class="px-3 py-2 rounded-md text-base font-medium text-white hover:bg-white/20 transition-colors">Beranda</a>
-                    <a href="{% url 'streamapp:all_list_anime_terbaru' %}" class="px-3 py-2 rounded-md text-base font-medium text-white hover:bg-white/20 transition-colors">Anime Terbaru</a>
-                    <a href="{% url 'streamapp:all_list_jadwal_rilis' %}" class="px-3 py-2 rounded-md text-base font-medium text-white hover:bg-white/20 transition-colors">Jadwal Rilis</a>
-                    <a href="{% url 'streamapp:all_list_movie' %}" class="px-3 py-2 rounded-md text-base font-medium text-white hover:bg-white/20 transition-colors">Movie</a>
+                    <a href="{% url 'streamapp:index' %}" class="px-3 py-2 rounded-md text-base font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">Beranda</a>
+                    <a href="{% url 'streamapp:all_list_anime_terbaru' %}" class="px-3 py-2 rounded-md text-base font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">Anime Terbaru</a>
+                    <a href="{% url 'streamapp:all_list_jadwal_rilis' %}" class="px-3 py-2 rounded-md text-base font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">Jadwal Rilis</a>
+                    <a href="{% url 'streamapp:all_list_movie' %}" class="px-3 py-2 rounded-md text-base font-medium text-black dark:text-white hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">Movie</a>
                     <div class="grid grid-cols-3 gap-2 mt-2">
-                        <a href="{% url 'streamapp:user_collection' %}?tab=watchlist" class="flex flex-col items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-white bg-white/10 hover:bg-white/20 transition-colors">
+                        <a href="{% url 'streamapp:user_collection' %}?tab=watchlist" class="flex flex-col items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-black dark:text-white bg-primary/10 dark:bg-white/10 hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">
                             <i class="fas fa-bookmark mb-1"></i>
                             <span>Watchlist</span>
                         </a>
-                        <a href="{% url 'streamapp:user_collection' %}?tab=favorites" class="flex flex-col items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-white bg-white/10 hover:bg-white/20 transition-colors">
+                        <a href="{% url 'streamapp:user_collection' %}?tab=favorites" class="flex flex-col items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-black dark:text-white bg-primary/10 dark:bg-white/10 hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">
                             <i class="fas fa-heart mb-1"></i>
                             <span>Favorit</span>
                         </a>
-                        <a href="{% url 'streamapp:user_collection' %}?tab=history" class="flex flex-col items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-white bg-white/10 hover:bg-white/20 transition-colors">
+                        <a href="{% url 'streamapp:user_collection' %}?tab=history" class="flex flex-col items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-black dark:text-white bg-primary/10 dark:bg-white/10 hover:bg-primary/20 dark:hover:bg-white/20 transition-colors">
                             <i class="fas fa-clock mb-1"></i>
                             <span>Riwayat</span>
                         </a>
@@ -284,31 +312,31 @@
     </main>
     
     <!-- Footer -->
-    <footer class="bg-black/30 backdrop-blur-md py-6 mt-10 border-t border-white/10">
+    <footer class="bg-white/80 dark:bg-black/30 backdrop-blur-md py-6 mt-10 border-t border-primary/30 dark:border-white/10">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <div class="mb-4 md:mb-0">
-                    <span class="text-xl font-bold text-white">🎌 Kortek<span class="text-red-500">Stream</span></span>
-                    <p class="text-gray-300 text-sm mt-1">Nonton Anime Subtitle Indonesia</p>
+                    <span class="text-xl font-bold text-black dark:text-white">🎌 Kortek<span class="text-red-500">Stream</span></span>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm mt-1">Nonton Anime Subtitle Indonesia</p>
                 </div>
                 
                 <div class="flex space-x-4">
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <a href="#" class="text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors">
                         <i class="fab fa-facebook-f"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <a href="#" class="text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors">
                         <i class="fab fa-twitter"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <a href="#" class="text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors">
                         <i class="fab fa-instagram"></i>
                     </a>
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <a href="#" class="text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors">
                         <i class="fab fa-discord"></i>
                     </a>
                 </div>
             </div>
             
-            <div class="mt-4 text-center text-gray-400 text-sm">
+            <div class="mt-4 text-center text-gray-600 dark:text-gray-400 text-sm">
                 <p>&copy; 2025 KortekStream. Semua hak dilindungi.</p>
                 <p class="mt-1">Disclaimer: Semua konten anime yang ditampilkan di situs ini bersumber dari pihak ketiga.</p>
             </div>
@@ -335,16 +363,49 @@
             }
         });
         
-        // Set dark mode as default
-        if (!localStorage.getItem('theme')) {
-            localStorage.setItem('theme', 'dark');
+        // Function to check if user prefers dark mode
+        function userPrefersDarkMode() {
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         }
         
-        // Check for saved theme preference
-        if (localStorage.getItem('theme') === 'light') {
-            document.documentElement.classList.remove('dark');
-        } else {
-            document.documentElement.classList.add('dark');
+        // Set theme based on user preference or saved preference
+        function setThemePreference() {
+            // Check if theme is saved in localStorage
+            const savedTheme = localStorage.getItem('theme');
+            
+            if (savedTheme) {
+                // Use saved preference
+                if (savedTheme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } else {
+                // No saved preference, check system preference
+                if (userPrefersDarkMode()) {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                }
+            }
+        }
+        
+        // Set theme on page load
+        setThemePreference();
+        
+        // Listen for changes in system preference
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                if (!localStorage.getItem('theme')) {
+                    if (event.matches) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                }
+            });
         }
         
         // Handle tab selection in user_collection page

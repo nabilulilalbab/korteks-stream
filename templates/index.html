@@ -62,6 +62,19 @@
         .theme-transition {
             transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
+        
+        /* Utility classes untuk konsistensi dengan template lain */
+        .light-bg {
+            @apply bg-black/20 backdrop-blur-md dark:bg-black/40;
+        }
+        
+        .light-text {
+            @apply text-black dark:text-white;
+        }
+        
+        .light-border {
+            @apply border-primary-light/70 dark:border-gray-700/50;
+        }
     </style>
     {% block content %}{% endblock content %}
     <script>
@@ -70,11 +83,25 @@
             localStorage.setItem('theme', 'dark');
         }
         
-        // Check for saved theme preference
-        if (localStorage.getItem('theme') === 'light') {
+        // Check for saved theme preference or system preference
+        const userPreference = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (userPreference === 'light' || (!userPreference && !systemPrefersDark)) {
             document.documentElement.classList.remove('dark');
         } else {
             document.documentElement.classList.add('dark');
+        }
+        
+        // Toggle theme function
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
         }
     </script>
 </body>

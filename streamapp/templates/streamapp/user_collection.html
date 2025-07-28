@@ -6,9 +6,9 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Breadcrumb -->
     <nav class="flex mb-6" aria-label="Breadcrumb">
-        <ol class="inline-flex items-center space-x-1 md:space-x-3 bg-black/30 backdrop-blur-md px-4 py-2 rounded-lg border border-gray-700/50 dark:bg-black/30">
+        <ol class="inline-flex items-center space-x-1 md:space-x-3 light-bg backdrop-blur-md px-4 py-2 rounded-lg light-border">
             <li class="inline-flex items-center">
-                <a href="{% url 'streamapp:index' %}" class="inline-flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-dark dark:hover:text-darkPrimary-light">
+                <a href="{% url 'streamapp:index' %}" class="inline-flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary-dark hover:text-primary">
                     <i class="fas fa-home mr-2"></i>
                     Beranda
                 </a>
@@ -27,7 +27,7 @@
         <div class="border-b border-gray-200 dark:border-gray-700">
             <ul class="flex flex-wrap -mb-px" id="collection-tabs" role="tablist">
                 <li class="mr-2" role="presentation">
-                    <button class="inline-block py-4 px-4 text-sm font-medium text-center border-b-2 border-primary dark:border-darkPrimary text-primary dark:text-darkPrimary rounded-t-lg active" 
+                    <button class="inline-block py-4 px-4 text-sm font-medium text-center border-b-2 border-primary text-primary rounded-t-lg active"
                             id="watchlist-tab" 
                             data-tabs-target="#watchlist" 
                             type="button" 
@@ -68,8 +68,8 @@
         <!-- Watchlist Tab -->
         <div class="block" id="watchlist" role="tabpanel" aria-labelledby="watchlist-tab">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Watchlist Saya</h2>
-                <button id="clear-watchlist" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors dark:bg-red-600 dark:hover:bg-red-700">
+                <h2 class="text-2xl font-bold light-text">Watchlist Saya</h2>
+                <button id="clear-watchlist" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
                     <i class="fas fa-trash-alt mr-2"></i>Hapus Semua
                 </button>
             </div>
@@ -86,8 +86,8 @@
         <!-- Favorites Tab -->
         <div class="hidden" id="favorites" role="tabpanel" aria-labelledby="favorites-tab">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Anime Favorit</h2>
-                <button id="clear-favorites" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors dark:bg-red-600 dark:hover:bg-red-700">
+                <h2 class="text-2xl font-bold light-text">Anime Favorit</h2>
+                <button id="clear-favorites" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
                     <i class="fas fa-trash-alt mr-2"></i>Hapus Semua
                 </button>
             </div>
@@ -104,8 +104,8 @@
         <!-- History Tab -->
         <div class="hidden" id="history" role="tabpanel" aria-labelledby="history-tab">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Riwayat Tontonan</h2>
-                <button id="clear-history" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors dark:bg-red-600 dark:hover:bg-red-700">
+                <h2 class="text-2xl font-bold light-text">Riwayat Tontonan</h2>
+                <button id="clear-history" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
                     <i class="fas fa-trash-alt mr-2"></i>Hapus Semua
                 </button>
             </div>
@@ -137,7 +137,7 @@
                 
                 // Remove active state from all buttons
                 tabButtons.forEach(btn => {
-                    btn.classList.remove('border-primary', 'dark:border-darkPrimary', 'text-primary', 'dark:text-darkPrimary');
+                    btn.classList.remove('border-primary', 'text-primary');
                     btn.classList.add('border-transparent');
                     btn.setAttribute('aria-selected', 'false');
                 });
@@ -150,7 +150,7 @@
                 
                 // Set active state to clicked button
                 button.classList.remove('border-transparent');
-                button.classList.add('border-primary', 'dark:border-darkPrimary', 'text-primary', 'dark:text-darkPrimary');
+                button.classList.add('border-primary', 'text-primary');
                 button.setAttribute('aria-selected', 'true');
             });
         });
@@ -198,7 +198,7 @@
         let html = '';
         watchlist.forEach(item => {
             html += `
-                <div class="anime-card dynamic-border bg-white dark:bg-darkSecondary rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700">
+                <div class="anime-card dynamic-border light-bg rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 light-border">
                     <a href="/detail_anime/${item.slug}" class="block">
                         <div class="relative pb-[140%] overflow-hidden">
                             <img src="${item.cover}" alt="${item.title}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 hover:scale-105">
@@ -207,13 +207,13 @@
                                 Watchlist
                             </div>
                             
-                            <button onclick="event.preventDefault(); removeFromWatchlistAndUpdate('${item.slug}')" class="absolute bottom-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors dark:bg-red-600 dark:hover:bg-red-700">
+                            <button onclick="event.preventDefault(); removeFromWatchlistAndUpdate('${item.slug}')" class="absolute bottom-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
                         
                         <div class="p-4">
-                            <h3 class="title text-sm font-semibold text-gray-800 dark:text-white mb-2 line-clamp-2 h-10">${item.title}</h3>
+                            <h3 class="title text-sm font-semibold light-text mb-2 line-clamp-2 h-10">${item.title}</h3>
                             <div class="text-xs text-gray-500 dark:text-gray-400">
                                 Ditambahkan: ${formatDate(item.addedAt)}
                             </div>
@@ -276,7 +276,7 @@
         let html = '';
         favorites.forEach(item => {
             html += `
-                <div class="anime-card dynamic-border bg-white dark:bg-darkSecondary rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700">
+                <div class="anime-card dynamic-border light-bg rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 light-border">
                     <a href="/detail_anime/${item.slug}" class="block">
                         <div class="relative pb-[140%] overflow-hidden">
                             <img src="${item.cover}" alt="${item.title}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 hover:scale-105">
@@ -285,13 +285,13 @@
                                 <i class="fas fa-heart mr-1"></i> Favorit
                             </div>
                             
-                            <button onclick="event.preventDefault(); removeFromFavoritesAndUpdate('${item.slug}')" class="absolute bottom-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors dark:bg-red-600 dark:hover:bg-red-700">
+                            <button onclick="event.preventDefault(); removeFromFavoritesAndUpdate('${item.slug}')" class="absolute bottom-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
                         
                         <div class="p-4">
-                            <h3 class="title text-sm font-semibold text-gray-800 dark:text-white mb-2 line-clamp-2 h-10">${item.title}</h3>
+                            <h3 class="title text-sm font-semibold light-text mb-2 line-clamp-2 h-10">${item.title}</h3>
                             <div class="text-xs text-gray-500 dark:text-gray-400">
                                 Ditambahkan: ${formatDate(item.addedAt)}
                             </div>
@@ -351,7 +351,7 @@
         let html = '';
         history.forEach(item => {
             html += `
-                <div class="anime-card dynamic-border bg-white dark:bg-darkSecondary rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700">
+                <div class="anime-card dynamic-border light-bg rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 light-border">
                     <a href="/detail_episode_video/${item.episodeSlug}" class="block">
                         <div class="relative pb-[140%] overflow-hidden">
                             <img src="${item.cover}" alt="${item.title}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 hover:scale-105">
@@ -360,16 +360,16 @@
                                 <i class="fas fa-play mr-1"></i> Ditonton
                             </div>
                             
-                            <button onclick="event.preventDefault(); removeFromHistoryAndUpdate('${item.episodeSlug}')" class="absolute bottom-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors dark:bg-red-600 dark:hover:bg-red-700">
+                            <button onclick="event.preventDefault(); removeFromHistoryAndUpdate('${item.episodeSlug}')" class="absolute bottom-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
                         
                         <div class="p-4">
-                            <h3 class="title text-sm font-semibold text-gray-800 dark:text-white mb-2 line-clamp-2 h-10">${item.episodeTitle}</h3>
+                            <h3 class="title text-sm font-semibold light-text mb-2 line-clamp-2 h-10">${item.episodeTitle}</h3>
                             <div class="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
                                 <span>${formatDate(item.watchedAt)}</span>
-                                <a href="/detail_anime/${item.slug}" class="text-primary dark:text-darkPrimary hover:underline">
+                                <a href="/detail_anime/${item.slug}" class="text-primary hover:underline">
                                     <i class="fas fa-info-circle mr-1"></i>Detail
                                 </a>
                             </div>
@@ -416,7 +416,7 @@
     function showNotification(message) {
         // Create notification element
         const notification = document.createElement('div');
-        notification.className = 'fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in-up dark:bg-black/70 dark:border dark:border-gray-700/50';
+        notification.className = 'fixed bottom-4 right-4 light-bg light-text px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in-up light-border';
         notification.textContent = message;
         
         // Add to DOM
