@@ -131,10 +131,10 @@ def scrape_anime_details(url):
         return None
 
 # --- CONTOH PENGGUNAAN ---
-if __name__ == "__main__":
-    target_url = "https://samehadaku.now/anime/one-piece/"
-    scraped_data = scrape_anime_details(target_url)
+# if __name__ == "__main__":
+#     target_url = "https://samehadaku.now/anime/one-piece/"
+#     scraped_data = scrape_anime_details(target_url)
 
-    if scraped_data:
-        print("\n✅ Data anime (termasuk rekomendasi) berhasil di-scrape!")
-        print(json.dumps(scraped_data, indent=4, ensure_ascii=False))
+#     if scraped_data:
+#         print("\n✅ Data anime (termasuk rekomendasi) berhasil di-scrape!")
+#         print(json.dumps(scraped_data, indent=4, ensure_ascii=False))

@@ -1,5 +1,6 @@
-{% extends 'streamapp/base.html' %}
 
+{% extends 'streamapp/base.html' %}
+{% load static %}
 {% block title %}{% if episode.title %}{{ episode.title }}{% else %}Detail Episode{% endif %} - KortekStream{% endblock %}
 
 {% block extra_css %}

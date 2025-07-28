@@ -144,13 +144,13 @@ def scrape_episode_details(url):
         return None
 
 # --- CONTOH PENGGUNAAN ---
-if __name__ == "__main__":
-    target_url = "https://samehadaku.now/sakamoto-days-cour-2-episode-1/"
-    start_time = time.time()
-    scraped_data = scrape_episode_details(target_url)
-    end_time = time.time()
+# if __name__ == "__main__":
+#     target_url = "https://samehadaku.now/sakamoto-days-cour-2-episode-1/"
+#     start_time = time.time()
+#     scraped_data = scrape_episode_details(target_url)
+#     end_time = time.time()
 
-    if scraped_data:
-        print("\n✅ Data episode berhasil di-scrape secara SUPER LENGKAP!")
-        print(json.dumps(scraped_data, indent=4, ensure_ascii=False))
-        print(f"\n🚀 Selesai dalam {end_time - start_time:.2f} detik")
+#     if scraped_data:
+#         print("\n✅ Data episode berhasil di-scrape secara SUPER LENGKAP!")
+#         print(json.dumps(scraped_data, indent=4, ensure_ascii=False))
+#         print(f"\n🚀 Selesai dalam {end_time - start_time:.2f} detik")

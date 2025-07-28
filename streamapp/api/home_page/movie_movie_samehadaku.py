@@ -165,5 +165,5 @@ def scrape_project_movies(get_better_covers=True):
     
     return scrape_project_movies_with_soup(soup, get_better_covers)
 
-if __name__ == "__main__":
-    print(scrape_project_movies())
+# if __name__ == "__main__":
+#     print(scrape_project_movies())

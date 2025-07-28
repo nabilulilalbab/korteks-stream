@@ -191,25 +191,25 @@ def get_all_anime_terbaru(max_pages=5):
     }
 
 # --- CONTOH PENGGUNAAN ---
-if __name__ == "__main__":
+# if __name__ == "__main__":
     
-    # Contoh 1: Hanya ingin tahu ada berapa total halaman
-    max_halaman = get_max_page()
-    print(f"Total halaman yang tersedia adalah: {max_halaman}")
+#     # Contoh 1: Hanya ingin tahu ada berapa total halaman
+#     max_halaman = get_max_page()
+#     print(f"Total halaman yang tersedia adalah: {max_halaman}")
     
-    print("\n" + "="*40 + "\n")
+#     print("\n" + "="*40 + "\n")
 
-    # Contoh 2: User API meminta data dari halaman 5
-    halaman_yang_diminta = 5
-    data_halaman_5 = scrape_anime_page(halaman_yang_diminta)
+#     # Contoh 2: User API meminta data dari halaman 5
+#     halaman_yang_diminta = 5
+#     data_halaman_5 = scrape_anime_page(halaman_yang_diminta)
     
-    if data_halaman_5:
-        print(f"✅ Berhasil mendapatkan {len(data_halaman_5)} data dari halaman {halaman_yang_diminta}")
-        print(json.dumps(data_halaman_5, indent=4, ensure_ascii=False))
+#     if data_halaman_5:
+#         print(f"✅ Berhasil mendapatkan {len(data_halaman_5)} data dari halaman {halaman_yang_diminta}")
+#         print(json.dumps(data_halaman_5, indent=4, ensure_ascii=False))
     
-    print("\n" + "="*40 + "\n")
+#     print("\n" + "="*40 + "\n")
     
-    # Contoh 3: Mengambil data dari beberapa halaman secara paralel
-    print("Mengambil data dari 3 halaman pertama secara paralel...")
-    all_data = scrape_multiple_pages(1, 3)
-    print(f"✅ Total data yang berhasil diambil: {len(all_data)}")
+#     # Contoh 3: Mengambil data dari beberapa halaman secara paralel
+#     print("Mengambil data dari 3 halaman pertama secara paralel...")
+#     all_data = scrape_multiple_pages(1, 3)
+#     print(f"✅ Total data yang berhasil diambil: {len(all_data)}")

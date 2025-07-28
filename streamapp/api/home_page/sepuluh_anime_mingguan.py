@@ -161,5 +161,5 @@ def scrape_top_10_anime(get_better_covers=True):
     
     return scrape_top_10_anime_with_soup(soup, get_better_covers)
 
-if __name__ == "__main__":
-    print(scrape_top_10_anime())
+# if __name__ == "__main__":
+#     print(scrape_top_10_anime())

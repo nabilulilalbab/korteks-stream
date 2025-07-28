@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="id" class="dark scroll-smooth">
 <head>
@@ -16,8 +17,10 @@
     <meta name="twitter:image" content="https://cdn.builder.io/api/v1/image/assets%2Fc5b47d20f6a943e485717e5895739988%2F56c6badd41c34fbbadac34159211505e">
     <meta name="twitter:image:alt" content="KortekStream - Nonton Anime Subtitle Indonesia">
     
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS -->
+    <!-- Gunakan CDN untuk development, uncomment output.css untuk production dengan Tailwind CLI -->
     <script src="https://cdn.tailwindcss.com"></script>
+    {% comment %} <link rel="stylesheet" href="{% static 'css/output.css' %}"> {% endcomment %}
     
     <!-- Konfigurasi Tailwind untuk tema baru -->
     <script>
@@ -69,7 +72,16 @@
                         },
                     },
                 }
-            }
+            },
+            // Pastikan kelas kustom dipertahankan saat menggunakan Tailwind CLI
+            safelist: [
+                'light-bg',
+                'light-text',
+                'light-border',
+                'dark:light-bg',
+                'dark:light-text',
+                'dark:light-border'
+            ]
         }
     </script>
     
@@ -159,37 +171,64 @@
             color: #ffffff;
         }
         
-        /* Light mode specific styles */
+        /* Light mode specific styles - Kompatibel dengan Tailwind CLI */
+        /* Kelas-kelas ini harus ditambahkan ke safelist di tailwind.config.js */
         .light-bg {
-            background-color: rgba(255, 255, 255, 0.95);
-            border-color: #daa520; /* Border kuning keemasan */
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border-color: #daa520 !important; /* Border kuning keemasan */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
         }
         
         .dark .light-bg {
-            background-color: rgba(0, 0, 0, 0.3);
-            border-color: rgba(75, 85, 99, 0.5);
-            box-shadow: none;
+            background-color: rgba(0, 0, 0, 0.3) !important;
+            border-color: rgba(75, 85, 99, 0.5) !important;
+            box-shadow: none !important;
         }
         
         .light-text {
-            color: #000000;
-            font-weight: 500;
+            color: #000000 !important;
+            font-weight: 500 !important;
         }
         
         .dark .light-text {
-            color: #ffffff;
-            font-weight: normal;
+            color: #ffffff !important;
+            font-weight: normal !important;
         }
         
         .light-border {
-            border-color: #daa520; /* Border kuning keemasan */
-            border-width: 1px;
+            border-color: #daa520 !important; /* Border kuning keemasan */
+            border-width: 1px !important;
         }
         
         .dark .light-border {
-            border-color: rgba(75, 85, 99, 0.5);
-            border-width: 1px;
+            border-color: rgba(75, 85, 99, 0.5) !important;
+            border-width: 1px !important;
+        }
+        
+        /* Alternatif menggunakan kelas Tailwind standar */
+        /* Gunakan kelas-kelas ini sebagai alternatif jika light-bg, light-text, light-border tidak berfungsi */
+        .tw-light-bg {
+            @apply bg-white/95 border-primary shadow-md;
+        }
+        
+        .dark .tw-light-bg {
+            @apply bg-black/30 border-gray-500/50 shadow-none;
+        }
+        
+        .tw-light-text {
+            @apply text-black font-medium;
+        }
+        
+        .dark .tw-light-text {
+            @apply text-white font-normal;
+        }
+        
+        .tw-light-border {
+            @apply border-primary border;
+        }
+        
+        .dark .tw-light-border {
+            @apply border-gray-500/50 border;
         }
         
         /* Styling untuk notifikasi */
@@ -532,5 +571,30 @@
     </script>
     
     {% block extra_js %}{% endblock %}
+    
+    <!-- Panduan untuk Tailwind CLI -->
+    <!--
+    Jika menggunakan Tailwind CLI, pastikan untuk:
+    1. Tambahkan kelas kustom ke safelist di input.css:
+       @source "../../**/templates/*.html";
+       @source "../../**/templates/**/*.html";
+       
+    2. Jika light mode rusak, gunakan kelas alternatif berikut:
+       - Ganti 'light-bg' dengan 'tw-light-bg'
+       - Ganti 'light-text' dengan 'tw-light-text'
+       - Ganti 'light-border' dengan 'tw-light-border'
+       
+       Contoh:
+       <div class="light-bg light-text light-border">...</div>
+       menjadi:
+       <div class="tw-light-bg tw-light-text tw-light-border">...</div>
+       
+    3. Jalankan build dengan: npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css
+    
+    4. Jika masih bermasalah, kembali ke Tailwind CDN dengan menghapus komentar pada:
+       <script src="https://cdn.tailwindcss.com"></script>
+       dan menambahkan komentar pada:
+       <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    -->
 </body>
 </html>
